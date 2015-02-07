@@ -23,4 +23,6 @@ string to_string(type value)
 	return os.str();
 }
 
+int edit_distance(const string &s1, const string &s2);
+
 #endif

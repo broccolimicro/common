@@ -63,3 +63,24 @@ bool sc(char c)
 			c == '\n' ||
 			c == '\r');
 }
+
+int edit_distance(const string &s1, const string &s2)
+{
+	vector<int> col((int)s2.size()+1);
+	vector<int> prev_col((int)s2.size()+1);
+
+	for (int i = 0; i < (int)prev_col.size(); i++)
+		prev_col[i] = i;
+
+	for (int i = 0; i < (int)s1.size(); i++)
+	{
+		col[0] = i+1;
+
+		for (int j = 0; j < (int)s2.size(); j++)
+			col[j+1] = min(min(prev_col[1 + j] + 1, col[j] + 1), prev_col[j] + (s1[i] == s2[j] ? 0 : 1));
+
+		col.swap(prev_col);
+	}
+
+	return prev_col[s2.size()];
+}
