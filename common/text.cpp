@@ -84,3 +84,26 @@ int edit_distance(const string &s1, const string &s2)
 
 	return prev_col[s2.size()];
 }
+
+int get_column_end(string line, int column_start, string *space)
+{
+	string str;
+	int column_end = 1;
+	for (int j = 0; j < (int)line.size() && j < column_start; j++)
+	{
+		if (line[j] != '\t')
+		{
+			str.push_back(' ');
+			column_end++;
+		}
+		else
+		{
+			str.push_back('\t');
+			column_end+=8;
+		}
+	}
+
+	if (space != NULL)
+		*space = str;
+	return column_end;
+}
