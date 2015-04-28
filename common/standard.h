@@ -32,15 +32,16 @@
 #include <fstream>
 #include <streambuf>
 #include <iterator>
+#include <deque>
 
 using namespace std;
 
 template <typename type>
-int vector_intersection_size(const vector<type> *v1, const vector<type> *v2)
+int vector_intersection_size(const vector<type> &v1, const vector<type> &v2)
 {
 	int result = 0;
 	typename vector<type>::const_iterator i, j;
-	for (i = v1->begin(), j = v2->begin(); i != v1->end() && j != v2->end();)
+	for (i = v1.begin(), j = v2.begin(); i != v1.end() && j != v2.end();)
 	{
 		if (*j > *i)
 			i++;
@@ -58,11 +59,11 @@ int vector_intersection_size(const vector<type> *v1, const vector<type> *v2)
 }
 
 template <typename type>
-void vector_symmetric_compliment(vector<type> *v1, vector<type> *v2)
+void vector_symmetric_compliment(vector<type> &v1, vector<type> &v2)
 {
 	vector<type> result;
 	typename vector<type>::iterator i, j;
-	for (i = v1->begin(), j = v2->begin(); i != v1->end() && j != v2->end();)
+	for (i = v1.begin(), j = v2.begin(); i != v1.end() && j != v2.end();)
 	{
 		if (*j > *i)
 			i++;
@@ -70,8 +71,8 @@ void vector_symmetric_compliment(vector<type> *v1, vector<type> *v2)
 			j++;
 		else
 		{
-			i = v1->erase(i);
-			j = v2->erase(j);
+			i = v1.erase(i);
+			j = v2.erase(j);
 		}
 	}
 }
