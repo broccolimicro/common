@@ -22,7 +22,15 @@ void done_progress();
 void complete();
 bool is_clean();
 
+void flag_errors(int num);
+void flag_warnings(int num);
+void flag_internal(int num);
+void flag_notes(int num);
+void flag_log(int num);
+
 void set_debug(bool value);
+bool get_debug();
 void set_verbose(bool value);
+bool get_verbose();
 
 #endif

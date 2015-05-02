@@ -119,12 +119,47 @@ bool is_clean()
 	return (num_internal == 0 && num_errors == 0);
 }
 
+void flag_errors(int num)
+{
+	num_errors += num;
+}
+
+void flag_warnings(int num)
+{
+	num_warnings += num;
+}
+
+void flag_internal(int num)
+{
+	num_internal += num;
+}
+
+void flag_notes(int num)
+{
+	num_notes += num;
+}
+
+void flag_log(int num)
+{
+	num_log += num;
+}
+
 void set_debug(bool value)
 {
 	debug = value;
 }
 
+bool get_debug()
+{
+	return debug;
+}
+
 void set_verbose(bool value)
 {
 	verbose = value;
+}
+
+bool get_verbose()
+{
+	return verbose;
 }
