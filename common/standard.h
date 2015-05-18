@@ -38,6 +38,21 @@
 using namespace std;
 
 template <typename type>
+map<type, int> count_elements(const vector<type> &v1, map<type, int> &result = map<type, int>())
+{
+	for (typename vector<type>::const_iterator i = v1.begin(); i != v1.end(); i++)
+	{
+		typename map<type, int>::iterator it = result.find(*i);
+		if (it != result.end())
+			it->second++;
+		else
+			result.insert(pair<type, int>(*i, 1));
+	}
+
+	return result;
+}
+
+template <typename type>
 int vector_intersection_size(const vector<type> &v1, const vector<type> &v2)
 {
 	int result = 0;
