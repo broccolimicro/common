@@ -15,6 +15,8 @@ int num_log = 0;
 bool verbose = true;
 bool debug = true;
 
+int progress_length = 0;
+
 void internal(string location, string internal, string debug_file, int debug_line)
 {
 	if (location != "")
@@ -81,14 +83,22 @@ void log(string location, string log, string debug_file, int debug_line)
 
 void progress(string location, string log, string debug_file, int debug_line)
 {
+	char str[1024];
 	if (debug && location != "")
-		printf("\r%s:%d:%s: %s                              ", debug_file.c_str(), debug_line, location.c_str(), log.c_str());
+		sprintf(str, "%s:%d:%s: %s", debug_file.c_str(), debug_line, location.c_str(), log.c_str());
 	else if (debug && location == "")
-		printf("\r%s:%d: %s                              ", debug_file.c_str(), debug_line, log.c_str());
+		sprintf(str, "%s:%d: %s", debug_file.c_str(), debug_line, log.c_str());
 	else if (!debug && location != "")
-		printf("\r%s: %s                              ", location.c_str(), log.c_str());
+		sprintf(str, "%s: %s", location.c_str(), log.c_str());
 	else if (!debug && location == "")
-		printf("\r%s                              ", log.c_str());
+		sprintf(str, "%s", log.c_str());
+	int length = strlen(str);
+	if (progress_length > length)
+		printf("\r%s%s", str, string(progress_length - length, ' ').c_str());
+	else
+		printf("\r%s", str);
+
+	progress_length = length+1;
 	fflush(stdout);
 }
 
@@ -102,7 +112,8 @@ void message(string message, string debug_file, int debug_line)
 
 void done_progress()
 {
-	printf("\r");
+	printf("\r%s\r", string(progress_length, ' ').c_str());
+	progress_length = 0;
 	fflush(stdout);
 }
 
