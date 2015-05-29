@@ -94,9 +94,9 @@ void progress(string location, string log, string debug_file, int debug_line)
 		sprintf(str, "%s", log.c_str());
 	int length = strlen(str);
 	if (progress_length > length)
-		printf("\r%s%s", str, string(progress_length - length, ' ').c_str());
+		printf("%s%s\r", str, string(progress_length - length, ' ').c_str());
 	else
-		printf("\r%s", str);
+		printf("%s\r", str);
 
 	progress_length = length+1;
 	fflush(stdout);
@@ -112,7 +112,7 @@ void message(string message, string debug_file, int debug_line)
 
 void done_progress()
 {
-	printf("\r%s\r", string(progress_length, ' ').c_str());
+	printf("%s\r", string(progress_length, ' ').c_str());
 	progress_length = 0;
 	fflush(stdout);
 }
