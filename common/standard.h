@@ -34,6 +34,7 @@
 #include <streambuf>
 #include <iterator>
 #include <deque>
+#include <limits>
 
 using namespace std;
 

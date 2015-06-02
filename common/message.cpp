@@ -24,6 +24,7 @@ void internal(string location, string internal, string debug_file, int debug_lin
 	else
 		printf("%s:%d: internal failure: %s\n", debug_file.c_str(), debug_line, internal.c_str());
 	num_internal++;
+	exit(0);
 }
 
 void error(string location, string error, string debug_file, int debug_line)
