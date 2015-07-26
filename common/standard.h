@@ -35,6 +35,7 @@
 #include <iterator>
 #include <deque>
 #include <limits>
+#include "hash.h"
 
 using namespace std;
 
