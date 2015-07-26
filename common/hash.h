@@ -10,6 +10,7 @@
 #include <string>
 #include <map>
 #include <sys/types.h>
+#include <stdint.h>
 
 using namespace std;
 
