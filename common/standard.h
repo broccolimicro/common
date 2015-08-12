@@ -24,6 +24,7 @@
 #include <dirent.h>
 
 #include <vector>
+#include <set>
 #include <list>
 #include <map>
 #include <string>
