@@ -107,3 +107,15 @@ int get_column_end(string line, int column_start, string *space)
 		*space = str;
 	return column_end;
 }
+
+string line_wrap(string str, int length)
+{
+	string result;
+	for (int i = 0; i < (int)str.size(); i += length)
+	{
+		result += str.substr(i, min((int)str.size(), i+length) - i);
+		if (i+length < (int)str.size())
+			result += "\n";
+	}
+	return result;
+}

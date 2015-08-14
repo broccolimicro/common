@@ -21,10 +21,34 @@ struct hasher
 {
 	hasher();
 
+	template <class type0, class type1>
+	hasher(const pair<type0, type1> *value)
+	{
+		put(value);
+	}
+
 	template <class type>
 	hasher(const type *value, int n = 1)
 	{
 		put(value, n);
+	}
+
+	template <class type>
+	hasher(const vector<type> *value)
+	{
+		put(value);
+	}
+
+	template <class type>
+	hasher(const list<type> *value)
+	{
+		put(value);
+	}
+
+	template <class key_type, class value_type>
+	hasher(const map<key_type, value_type> *lst)
+	{
+		put(lst);
 	}
 
 	~hasher();
@@ -55,6 +79,13 @@ struct hasher
 	void put(const bool *value, int n = 1);
 	void put(const float *value, int n = 1);
 	void put(const double *value, int n = 1);
+
+	template <class type0, class type1>
+	void put(const pair<type0, type1> *value)
+	{
+		put(&value->first);
+		put(&value->second);
+	}
 
 	template <class type>
 	void put(const vector<type> *lst)
@@ -89,18 +120,23 @@ struct hashmap
 	map<key_type, value_type> buckets[num_buckets];
 	int count;
 
-	typename map<key_type, value_type>::iterator insert(key_type key, value_type value)
+	bool insert(const key_type &key, const value_type &value, typename map<key_type, value_type>::iterator* loc = NULL)
 	{
 		int bucket = hasher(&key).get()%num_buckets;
-		typename map<key_type, value_type>::iterator result = buckets[bucket].insert(pair<key_type, value_type>(key, value)).first;
+		pair<typename map<key_type, value_type>::iterator, bool> result = buckets[bucket].insert(pair<key_type, value_type>(key, value));
+		if (loc != NULL)
+			*loc = result.first;
 		count++;
-		return result;
+		return result.second;
 	}
 
-	typename map<key_type, value_type>::iterator find(key_type key)
+	bool find(const key_type &key, typename map<key_type, value_type>::iterator* loc = NULL)
 	{
 		int bucket = hasher(&key).get()%num_buckets;
-		return buckets[bucket].find(key);
+		typename map<key_type, value_type>::iterator result = buckets[bucket].find(key);
+		if (loc != NULL)
+			*loc = result;
+		return (result != buckets[bucket].end());
 	}
 
 	void erase(typename map<key_type, value_type>::iterator iter)
