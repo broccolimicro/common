@@ -161,7 +161,7 @@ struct hashtable
 	vector<value_type> buckets[num_buckets];
 	int count;
 
-	bool insert(const value_type &value, value_type** loc = NULL)
+	bool insert(const value_type &value, typename vector<value_type>::iterator *loc = NULL)
 	{
 		int bucket = hasher(&value).get()%num_buckets;
 		typename vector<value_type>::iterator result = lower_bound(buckets[bucket].begin(), buckets[bucket].end(), value);
@@ -170,23 +170,23 @@ struct hashtable
 			result = buckets[bucket].insert(result, value);
 			count++;
 			if (loc != NULL)
-				*loc = &(*result);
+				*loc = result;
 
 			return true;
 		}
 
 		if (loc != NULL)
-			*loc = &(*result);
+			*loc = result;
 
 		return false;
 	}
 
-	bool contains(const value_type &value, value_type** loc = NULL)
+	bool contains(const value_type &value, typename vector<value_type>::iterator *loc = NULL)
 	{
 		int bucket = hasher(value).get()%num_buckets;
 		typename vector<value_type>::iterator result = lower_bound(buckets[bucket].begin(), buckets[bucket].end(), value);
 		if (loc != NULL)
-			*loc = &(*result);
+			*loc = result;
 
 		return (result != buckets[bucket].end() && *result == value);
 	}
