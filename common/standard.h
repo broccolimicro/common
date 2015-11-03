@@ -78,6 +78,28 @@ int vector_intersection_size(const vector<type> &v1, const vector<type> &v2)
 }
 
 template <typename type>
+vector<int> vector_intersection(const vector<type> &v1, const vector<type> &v2)
+{
+	vector<int> result;
+	typename vector<type>::const_iterator i, j;
+	for (i = v1.begin(), j = v2.begin(); i != v1.end() && j != v2.end();)
+	{
+		if (*j > *i)
+			i++;
+		else if (*i > *j)
+			j++;
+		else
+		{
+			result.push_back(*i);
+			i++;
+			j++;
+		}
+	}
+
+	return result;
+}
+
+template <typename type>
 void vector_symmetric_compliment(vector<type> &v1, vector<type> &v2)
 {
 	vector<type> result;
