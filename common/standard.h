@@ -78,6 +78,31 @@ int vector_intersection_size(const vector<type> &v1, const vector<type> &v2)
 }
 
 template <typename type>
+int vector_intersection_size(const vector<type> &v1, const vector<type> &v2, const vector<type> &v3)
+{
+	int result = 0;
+	typename vector<type>::const_iterator i, j, k;
+	for (i = v1.begin(), j = v2.begin(), k = v3.begin(); i != v1.end() && j != v2.end() && k != v3.end();)
+	{
+		if ((*i <= *j && *i < *k) || (*i < *j && *i <= *k))
+			i++;
+		else if ((*j <= *i && *j < *k) || (*j < *i && *j <= *k))
+			j++;
+		else if ((*k <= *j && *k < *i) || (*k < *j && *k <= *i))
+			k++;
+		else
+		{
+			result++;
+			i++;
+			j++;
+			k++;
+		}
+	}
+
+	return result;
+}
+
+template <typename type>
 vector<int> vector_intersection(const vector<type> &v1, const vector<type> &v2)
 {
 	vector<int> result;
