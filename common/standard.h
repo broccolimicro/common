@@ -78,6 +78,23 @@ int vector_intersection_size(const vector<type> &v1, const vector<type> &v2)
 }
 
 template <typename type>
+bool vector_intersects(const vector<type> &v1, const vector<type> &v2)
+{
+	typename vector<type>::const_iterator i, j;
+	for (i = v1.begin(), j = v2.begin(); i != v1.end() && j != v2.end();)
+	{
+		if (*j > *i)
+			i++;
+		else if (*i > *j)
+			j++;
+		else
+			return true;
+	}
+
+	return false;
+}
+
+template <typename type>
 int vector_intersection_size(const vector<type> &v1, const vector<type> &v2, const vector<type> &v3)
 {
 	int result = 0;
@@ -127,7 +144,6 @@ vector<int> vector_intersection(const vector<type> &v1, const vector<type> &v2)
 template <typename type>
 void vector_symmetric_compliment(vector<type> &v1, vector<type> &v2)
 {
-	vector<type> result;
 	typename vector<type>::iterator i, j;
 	for (i = v1.begin(), j = v2.begin(); i != v1.end() && j != v2.end();)
 	{
@@ -141,6 +157,29 @@ void vector_symmetric_compliment(vector<type> &v1, vector<type> &v2)
 			j = v2.erase(j);
 		}
 	}
+}
+
+template <typename type>
+vector<type> vector_difference(const vector<type> &v1, const vector<type> &v2)
+{
+	vector<type> result;
+	typename vector<type>::const_iterator i, j;
+	for (i = v1.begin(), j = v2.begin(); i != v1.end() && j != v2.end();)
+	{
+		if (*j > *i)
+		{
+			result.push_back(*i);
+			i++;
+		}
+		else if (*i > *j)
+			j++;
+		else
+		{
+			i++;
+			j++;
+		}
+	}
+	return result;
 }
 
 template <typename type>
