@@ -120,9 +120,9 @@ int vector_intersection_size(const vector<type> &v1, const vector<type> &v2, con
 }
 
 template <typename type>
-vector<int> vector_intersection(const vector<type> &v1, const vector<type> &v2)
+vector<type> vector_intersection(const vector<type> &v1, const vector<type> &v2)
 {
-	vector<int> result;
+	vector<type> result;
 	typename vector<type>::const_iterator i, j;
 	for (i = v1.begin(), j = v2.begin(); i != v1.end() && j != v2.end();)
 	{
@@ -135,6 +135,43 @@ vector<int> vector_intersection(const vector<type> &v1, const vector<type> &v2)
 			result.push_back(*i);
 			i++;
 			j++;
+		}
+	}
+
+	return result;
+}
+
+template <typename type>
+vector<type> vector_intersection(const vector<vector<type> > &v)
+{
+	vector<type> result;
+	vector<int> i(v.size(), 0);
+
+	bool done = false;
+	while (!done)
+	{
+		vector<int> ind(1, 0);
+		type value = v[0][i[0]];
+		for (int j = 1; j < (int)v.size(); j++)
+		{
+			if (v[j][i[j]] < value)
+			{
+				value = v[j][i[j]];
+				ind.clear();
+				ind.push_back(j);
+			}
+			else if (v[j][i[j]] == value)
+				ind.push_back(j);
+		}
+
+		if (ind.size() == v.size())
+			result.push_back(value);
+
+		for (int j = 0; j < (int)ind.size(); j++)
+		{
+			i[ind[j]]++;
+			if (i[ind[j]] >= (int)v[ind[j]].size())
+				done = true;
 		}
 	}
 
@@ -164,14 +201,14 @@ vector<type> vector_difference(const vector<type> &v1, const vector<type> &v2)
 {
 	vector<type> result;
 	typename vector<type>::const_iterator i, j;
-	for (i = v1.begin(), j = v2.begin(); i != v1.end() && j != v2.end();)
+	for (i = v1.begin(), j = v2.begin(); i != v1.end() || j != v2.end();)
 	{
-		if (*j > *i)
+		if (j == v2.end() || (i != v1.end() && *j > *i))
 		{
 			result.push_back(*i);
 			i++;
 		}
-		else if (*i > *j)
+		else if (i == v1.end() || (j != v2.end() && *i > *j))
 			j++;
 		else
 		{

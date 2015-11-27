@@ -23,6 +23,54 @@ string to_string(type value)
 	return os.str();
 }
 
+template <typename type>
+string to_string(vector<type> s)
+{
+	string result = "{";
+	for (size_t i = 0; i < s.size(); i++)
+	{
+		if (i != 0)
+			result += ", ";
+		result += to_string(s[i]);
+	}
+	result += "}";
+	return result;
+}
+
+template <typename type>
+string to_string(list<type> s)
+{
+	string result = "{";
+	for (typename list<type>::iterator i = s.begin(); i != s.end(); i++)
+	{
+		if (i != s.begin())
+			result += ", ";
+		result += to_string(*i);
+	}
+	result += "}";
+	return result;
+}
+
+template <typename type1, typename type2>
+string to_string(map<type1, type2> s)
+{
+	string result = "{";
+	for (typename map<type1, type2>::iterator i = s.begin(); i != s.end(); i++)
+	{
+		if (i != s.begin())
+			result += ", ";
+		result += i->first + "=>" + i->second;
+	}
+	result += "}";
+	return result;
+}
+
+template <typename type1, typename type2>
+string to_string(pair<type1, type2> s)
+{
+	return "(" + to_string(s.first) + ", " + to_string(s.second) + ")";
+}
+
 int edit_distance(const string &s1, const string &s2);
 int get_column_end(string line, int column_start, string *space = NULL);
 string line_wrap(string str, int length);
