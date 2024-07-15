@@ -1,14 +1,4 @@
-/*
-
- * standard.h
- *
- * Common is a collection of functions not specific to the compiler that
- * we found useful to define. Note that our #defines for user flags are
- * also stored in common.h as it is accessed by everyone.
- */
-
-#ifndef common_standard_h
-#define common_standard_h
+#pragma once
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -40,26 +30,26 @@
 
 using namespace std;
 
-template <typename type>
-map<type, int> count_elements(const vector<type> &v1, map<type, int> &result = map<type, int>())
+template <typename T>
+map<T, int> count_elements(const vector<T> &v1, map<T, int> &result = map<T, int>())
 {
-	for (typename vector<type>::const_iterator i = v1.begin(); i != v1.end(); i++)
+	for (typename vector<T>::const_iterator i = v1.begin(); i != v1.end(); i++)
 	{
-		typename map<type, int>::iterator it = result.find(*i);
+		typename map<T, int>::iterator it = result.find(*i);
 		if (it != result.end())
 			it->second++;
 		else
-			result.insert(pair<type, int>(*i, 1));
+			result.insert(pair<T, int>(*i, 1));
 	}
 
 	return result;
 }
 
-template <typename type>
-int vector_intersection_size(const vector<type> &v1, const vector<type> &v2)
+template <typename T>
+int vector_intersection_size(const vector<T> &v1, const vector<T> &v2)
 {
 	int result = 0;
-	typename vector<type>::const_iterator i, j;
+	typename vector<T>::const_iterator i, j;
 	for (i = v1.begin(), j = v2.begin(); i != v1.end() && j != v2.end();)
 	{
 		if (*j > *i)
@@ -77,10 +67,10 @@ int vector_intersection_size(const vector<type> &v1, const vector<type> &v2)
 	return result;
 }
 
-template <typename type>
-bool vector_intersects(const vector<type> &v1, const vector<type> &v2)
+template <typename T>
+bool vector_intersects(const vector<T> &v1, const vector<T> &v2)
 {
-	typename vector<type>::const_iterator i, j;
+	typename vector<T>::const_iterator i, j;
 	for (i = v1.begin(), j = v2.begin(); i != v1.end() && j != v2.end();)
 	{
 		if (*j > *i)
@@ -94,11 +84,11 @@ bool vector_intersects(const vector<type> &v1, const vector<type> &v2)
 	return false;
 }
 
-template <typename type>
-int vector_intersection_size(const vector<type> &v1, const vector<type> &v2, const vector<type> &v3)
+template <typename T>
+int vector_intersection_size(const vector<T> &v1, const vector<T> &v2, const vector<T> &v3)
 {
 	int result = 0;
-	typename vector<type>::const_iterator i, j, k;
+	typename vector<T>::const_iterator i, j, k;
 	for (i = v1.begin(), j = v2.begin(), k = v3.begin(); i != v1.end() && j != v2.end() && k != v3.end();)
 	{
 		if ((*i <= *j && *i < *k) || (*i < *j && *i <= *k))
@@ -119,11 +109,11 @@ int vector_intersection_size(const vector<type> &v1, const vector<type> &v2, con
 	return result;
 }
 
-template <typename type>
-vector<type> vector_intersection(const vector<type> &v1, const vector<type> &v2)
+template <typename T>
+vector<T> vector_intersection(const vector<T> &v1, const vector<T> &v2)
 {
-	vector<type> result;
-	typename vector<type>::const_iterator i, j;
+	vector<T> result;
+	typename vector<T>::const_iterator i, j;
 	for (i = v1.begin(), j = v2.begin(); i != v1.end() && j != v2.end();)
 	{
 		if (*j > *i)
@@ -141,17 +131,17 @@ vector<type> vector_intersection(const vector<type> &v1, const vector<type> &v2)
 	return result;
 }
 
-template <typename type>
-vector<type> vector_intersection(const vector<vector<type> > &v)
+template <typename T>
+vector<T> vector_intersection(const vector<vector<T> > &v)
 {
-	vector<type> result;
+	vector<T> result;
 	vector<int> i(v.size(), 0);
 
 	bool done = false;
 	while (!done)
 	{
 		vector<int> ind(1, 0);
-		type value = v[0][i[0]];
+		T value = v[0][i[0]];
 		for (int j = 1; j < (int)v.size(); j++)
 		{
 			if (v[j][i[j]] < value)
@@ -178,10 +168,10 @@ vector<type> vector_intersection(const vector<vector<type> > &v)
 	return result;
 }
 
-template <typename type>
-void vector_symmetric_compliment(vector<type> &v1, vector<type> &v2)
+template <typename T>
+void vector_symmetric_compliment(vector<T> &v1, vector<T> &v2)
 {
-	typename vector<type>::iterator i, j;
+	typename vector<T>::iterator i, j;
 	for (i = v1.begin(), j = v2.begin(); i != v1.end() && j != v2.end();)
 	{
 		if (*j > *i)
@@ -196,11 +186,11 @@ void vector_symmetric_compliment(vector<type> &v1, vector<type> &v2)
 	}
 }
 
-template <typename type>
-vector<type> vector_difference(const vector<type> &v1, const vector<type> &v2)
+template <typename T>
+vector<T> vector_difference(const vector<T> &v1, const vector<T> &v2)
 {
-	vector<type> result;
-	typename vector<type>::const_iterator i, j;
+	vector<T> result;
+	typename vector<T>::const_iterator i, j;
 	for (i = v1.begin(), j = v2.begin(); i != v1.end() || j != v2.end();)
 	{
 		if (j == v2.end() || (i != v1.end() && *j > *i))
@@ -219,8 +209,8 @@ vector<type> vector_difference(const vector<type> &v1, const vector<type> &v2)
 	return result;
 }
 
-template <typename type>
-ostream &operator<<(ostream &os, vector<type> s)
+template <typename T>
+ostream &operator<<(ostream &os, const vector<T> &s)
 {
 	os << "{";
 	for (size_t i = 0; i < s.size(); i++)
@@ -233,11 +223,11 @@ ostream &operator<<(ostream &os, vector<type> s)
 	return os;
 }
 
-template <typename type>
-ostream &operator<<(ostream &os, list<type> s)
+template <typename T>
+ostream &operator<<(ostream &os, const list<T> &s)
 {
 	os << "{";
-	for (typename list<type>::iterator i = s.begin(); i != s.end(); i++)
+	for (auto i = s.begin(); i != s.end(); i++)
 	{
 		if (i != s.begin())
 			os << ", ";
@@ -247,11 +237,11 @@ ostream &operator<<(ostream &os, list<type> s)
 	return os;
 }
 
-template <typename type1, typename type2>
-ostream &operator<<(ostream &os, map<type1, type2> s)
+template <typename T1, typename T2>
+ostream &operator<<(ostream &os, const map<T1, T2> &s)
 {
 	os << "{";
-	for (typename map<type1, type2>::iterator i = s.begin(); i != s.end(); i++)
+	for (auto i = s.begin(); i != s.end(); i++)
 	{
 		if (i != s.begin())
 			os << ", ";
@@ -261,11 +251,10 @@ ostream &operator<<(ostream &os, map<type1, type2> s)
 	return os;
 }
 
-template <typename type1, typename type2>
-ostream &operator<<(ostream &os, pair<type1, type2> s)
+template <typename T1, typename T2>
+ostream &operator<<(ostream &os, const pair<T1, T2> &s)
 {
 	os << "(" << s.first << ", " << s.second << ")";
 	return os;
 }
 
-#endif

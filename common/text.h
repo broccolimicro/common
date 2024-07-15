@@ -1,14 +1,6 @@
-/*
- * text.h
- *
- *  Created on: Jan 31, 2015
- *      Author: nbingham
- */
+#pragma once
 
 #include "standard.h"
-
-#ifndef common_text_h
-#define common_text_h
 
 bool ac(char c);
 bool nc(char c);
@@ -24,7 +16,7 @@ string to_string(type value)
 }
 
 template <typename type>
-string to_string(vector<type> s)
+string to_string(const vector<type> &s)
 {
 	string result = "{";
 	for (size_t i = 0; i < s.size(); i++)
@@ -38,10 +30,10 @@ string to_string(vector<type> s)
 }
 
 template <typename type>
-string to_string(list<type> s)
+string to_string(const list<type> &s)
 {
 	string result = "{";
-	for (typename list<type>::iterator i = s.begin(); i != s.end(); i++)
+	for (auto i = s.begin(); i != s.end(); i++)
 	{
 		if (i != s.begin())
 			result += ", ";
@@ -52,10 +44,10 @@ string to_string(list<type> s)
 }
 
 template <typename type1, typename type2>
-string to_string(map<type1, type2> s)
+string to_string(const map<type1, type2> &s)
 {
 	string result = "{";
-	for (typename map<type1, type2>::iterator i = s.begin(); i != s.end(); i++)
+	for (auto i = s.begin(); i != s.end(); i++)
 	{
 		if (i != s.begin())
 			result += ", ";
@@ -66,7 +58,7 @@ string to_string(map<type1, type2> s)
 }
 
 template <typename type1, typename type2>
-string to_string(pair<type1, type2> s)
+string to_string(const pair<type1, type2> &s)
 {
 	return "(" + to_string(s.first) + ", " + to_string(s.second) + ")";
 }
@@ -75,4 +67,3 @@ int edit_distance(const string &s1, const string &s2);
 int get_column_end(string line, int column_start, string *space = NULL);
 string line_wrap(string str, int length);
 
-#endif
