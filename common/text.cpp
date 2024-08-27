@@ -64,6 +64,13 @@ bool sc(char c)
 			c == '\r');
 }
 
+string lower(string str) {
+	for (auto c = str.begin(); c != str.end(); c++) {
+		*c = tolower(*c);
+	}
+	return str;
+}
+
 int edit_distance(const string &s1, const string &s2)
 {
 	vector<int> col((int)s2.size()+1);
