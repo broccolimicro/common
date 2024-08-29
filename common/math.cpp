@@ -1,11 +1,6 @@
-/*
- * math.cpp
- *
- *  Created on: Jan 31, 2015
- *      Author: nbingham
- */
-
 #include "math.h"
+
+#include <random>
 
 unsigned int count_ones(unsigned int x)
 {
@@ -64,4 +59,14 @@ int log2i(unsigned long long value)
   }
 
   return y;
+}
+
+uint64_t pareto(uint64_t scale, double shape) {
+	static std::random_device rd;  // Seed for randomness
+	static std::mt19937_64 gen(rd()); // Mersenne Twister generator
+
+	std::uniform_real_distribution<> dis(0.0,1.0);
+	double c = pow(dis(gen), 1.0/shape);
+	uint64_t ci = (uint64_t)(((double)(1ul<<32))*c);
+	return min(scale, (scale<<32)/max(1ul,ci) - scale);
 }
