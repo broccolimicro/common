@@ -68,5 +68,5 @@ uint64_t pareto(uint64_t scale, double shape) {
 	std::uniform_real_distribution<> dis(0.0,1.0);
 	double c = pow(dis(gen), 1.0/shape);
 	uint64_t ci = (uint64_t)(((double)(1ul<<32))*c);
-	return min(scale, (scale<<32)/max(1ul,ci) - scale);
+	return min(scale, (scale<<32)/max((uint64_t)1ul,ci) - scale);
 }
