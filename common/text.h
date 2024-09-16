@@ -68,3 +68,6 @@ int edit_distance(const string &s1, const string &s2);
 int get_column_end(string line, int column_start, string *space = NULL);
 string line_wrap(string str, int length);
 
+size_t findFirstUnescapedSpace(const std::string& str);
+std::string extractPath(const std::string& input);
+

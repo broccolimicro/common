@@ -126,3 +126,40 @@ string line_wrap(string str, int length)
 	}
 	return result;
 }
+
+// Function to find the first unescaped space
+size_t findFirstUnescapedSpace(const std::string& str) {
+	bool inEscape = false;
+
+	for (size_t i = 0; i < str.size(); ++i) {
+		if (inEscape) {
+			// If we are in an escape sequence, skip the current character
+			inEscape = false;
+		} else if (str[i] == '\\') {
+			// If we encounter a backslash, set the escape flag
+			inEscape = true;
+		} else if (str[i] == ' ') {
+			// If we encounter a space that is not escaped, return its position
+			return i;
+		}
+	}
+
+	// If no unescaped space is found, return string::npos
+	return std::string::npos;
+}
+
+// Function to extract the file format from the path at the beginning of the arguments
+std::string extractPath(const std::string& input) {
+	// Find the first unescaped space, which ends the path
+	size_t spacePos = findFirstUnescapedSpace(input);
+
+	// If no space is found, consider the entire input to be a single argument (path)
+	std::string path;
+	if (spacePos != std::string::npos) {
+		path = input.substr(0, spacePos);
+	} else {
+		path = input;
+	}
+
+	return path;
+}
