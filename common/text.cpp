@@ -64,6 +64,20 @@ bool sc(char c)
 			c == '\r');
 }
 
+string to_minstring(float value)
+{
+	static char result[32];
+	sprintf(result, "%g", value);
+	return string(result);
+}
+
+string to_minstring(double value)
+{
+	static char result[64];
+	sprintf(result, "%g", value);
+	return string(result);
+}
+
 string lower(string str) {
 	for (auto c = str.begin(); c != str.end(); c++) {
 		*c = tolower(*c);

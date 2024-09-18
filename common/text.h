@@ -7,6 +7,9 @@ bool nc(char c);
 bool oc(char c);
 bool sc(char c);
 
+string to_minstring(float value);
+string to_minstring(double value);
+
 template <class type>
 string to_string(type value)
 {
