@@ -52,9 +52,9 @@ int vector_intersection_size(const vector<T> &v1, const vector<T> &v2)
 	typename vector<T>::const_iterator i, j;
 	for (i = v1.begin(), j = v2.begin(); i != v1.end() && j != v2.end();)
 	{
-		if (*j > *i)
+		if (*i < *j)
 			i++;
-		else if (*i > *j)
+		else if (*j < *i)
 			j++;
 		else
 		{
@@ -73,9 +73,9 @@ bool vector_intersects(const vector<T> &v1, const vector<T> &v2)
 	typename vector<T>::const_iterator i, j;
 	for (i = v1.begin(), j = v2.begin(); i != v1.end() && j != v2.end();)
 	{
-		if (*j > *i)
+		if (*i < *j)
 			i++;
-		else if (*i > *j)
+		else if (*j < *i)
 			j++;
 		else
 			return true;
@@ -83,6 +83,26 @@ bool vector_intersects(const vector<T> &v1, const vector<T> &v2)
 
 	return false;
 }
+
+template <typename T>
+bool vector_is_subset_of(const vector<T> &v1, const vector<T> &v2)
+{
+	typename vector<T>::const_iterator i, j;
+	for (i = v1.begin(), j = v2.begin(); i != v1.end() && j != v2.end();)
+	{
+		if (*i < *j) {
+			return false;
+		} else if (*j < *i) {
+			j++;
+		} else {
+			i++;
+			j++;
+		}
+	}
+
+	return true;
+}
+
 
 template <typename T>
 int vector_intersection_size(const vector<T> &v1, const vector<T> &v2, const vector<T> &v3)
@@ -116,9 +136,9 @@ vector<T> vector_intersection(const vector<T> &v1, const vector<T> &v2)
 	typename vector<T>::const_iterator i, j;
 	for (i = v1.begin(), j = v2.begin(); i != v1.end() && j != v2.end();)
 	{
-		if (*j > *i)
+		if (*i < *j)
 			i++;
-		else if (*i > *j)
+		else if (*j < *i)
 			j++;
 		else
 		{
@@ -174,9 +194,9 @@ void vector_symmetric_compliment(vector<T> &v1, vector<T> &v2)
 	typename vector<T>::iterator i, j;
 	for (i = v1.begin(), j = v2.begin(); i != v1.end() && j != v2.end();)
 	{
-		if (*j > *i)
+		if (*i < *j)
 			i++;
-		else if (*i > *j)
+		else if (*j < *i)
 			j++;
 		else
 		{
@@ -193,12 +213,12 @@ vector<T> vector_difference(const vector<T> &v1, const vector<T> &v2)
 	typename vector<T>::const_iterator i, j;
 	for (i = v1.begin(), j = v2.begin(); i != v1.end() || j != v2.end();)
 	{
-		if (j == v2.end() || (i != v1.end() && *j > *i))
+		if (j == v2.end() || (i != v1.end() && *i < *j))
 		{
 			result.push_back(*i);
 			i++;
 		}
-		else if (i == v1.end() || (j != v2.end() && *i > *j))
+		else if (i == v1.end() || (j != v2.end() && *j < *i))
 			j++;
 		else
 		{
