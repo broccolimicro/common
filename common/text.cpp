@@ -177,3 +177,15 @@ std::string extractPath(const std::string& input) {
 
 	return path;
 }
+
+std::string escapePath(const std::string &input) {
+	std::string result;
+	for (auto c = input.begin(); c != input.end(); c++) {
+		if (*c == ' ' or *c == '\\') {
+			result.push_back('\\');
+		}
+		result.push_back(*c);
+	}
+	return result;
+}
+
