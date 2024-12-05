@@ -189,7 +189,7 @@ vector<T> vector_intersection(const vector<vector<T> > &v)
 }
 
 template <typename T>
-void vector_symmetric_compliment(vector<T> &v1, vector<T> &v2)
+void vector_symmetric_complement(vector<T> &v1, vector<T> &v2)
 {
 	typename vector<T>::iterator i, j;
 	for (i = v1.begin(), j = v2.begin(); i != v1.end() && j != v2.end();)
