@@ -70,15 +70,15 @@ int vector_intersection_size(const vector<T> &v1, const vector<T> &v2)
 template <typename T>
 bool vector_intersects(const vector<T> &v1, const vector<T> &v2)
 {
-	typename vector<T>::const_iterator i, j;
-	for (i = v1.begin(), j = v2.begin(); i != v1.end() && j != v2.end();)
-	{
-		if (*i < *j)
+	typename vector<T>::const_iterator i = v1.begin(), j = v2.begin();
+	while (i != v1.end() and j != v2.end()) {
+		if (*i < *j) {
 			i++;
-		else if (*j < *i)
+		} else if (*j < *i) {
 			j++;
-		else
+		} else {
 			return true;
+		}
 	}
 
 	return false;
@@ -87,9 +87,8 @@ bool vector_intersects(const vector<T> &v1, const vector<T> &v2)
 template <typename T>
 bool vector_is_subset_of(const vector<T> &v1, const vector<T> &v2)
 {
-	typename vector<T>::const_iterator i, j;
-	for (i = v1.begin(), j = v2.begin(); i != v1.end() && j != v2.end();)
-	{
+	typename vector<T>::const_iterator i = v1.begin(), j = v2.begin();
+	while (i != v1.end() and j != v2.end()) {
 		if (*i < *j) {
 			return false;
 		} else if (*j < *i) {
@@ -100,7 +99,7 @@ bool vector_is_subset_of(const vector<T> &v1, const vector<T> &v2)
 		}
 	}
 
-	return true;
+	return i == v1.end();
 }
 
 
@@ -210,22 +209,19 @@ template <typename T>
 vector<T> vector_difference(const vector<T> &v1, const vector<T> &v2)
 {
 	vector<T> result;
-	typename vector<T>::const_iterator i, j;
-	for (i = v1.begin(), j = v2.begin(); i != v1.end() || j != v2.end();)
-	{
-		if (j == v2.end() || (i != v1.end() && *i < *j))
-		{
+	typename vector<T>::const_iterator i = v1.begin(), j = v2.begin();
+	while (i != v1.end() and j != v2.end()) {
+		if (*i < *j) {
 			result.push_back(*i);
 			i++;
-		}
-		else if (i == v1.end() || (j != v2.end() && *j < *i))
+		} else if (*j < *i) {
 			j++;
-		else
-		{
+		} else {
 			i++;
 			j++;
 		}
 	}
+	result.insert(result.end(), i, v1.end());
 	return result;
 }
 
