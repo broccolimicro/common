@@ -46,6 +46,20 @@ string to_string(const list<type> &s)
 	return result;
 }
 
+template <typename type>
+string to_string(const set<type> &s)
+{
+	string result = "{";
+	for (auto i = s.begin(); i != s.end(); i++)
+	{
+		if (i != s.begin())
+			result += ", ";
+		result += to_string(*i);
+	}
+	result += "}";
+	return result;
+}
+
 template <typename type1, typename type2>
 string to_string(const map<type1, type2> &s)
 {
@@ -54,7 +68,7 @@ string to_string(const map<type1, type2> &s)
 	{
 		if (i != s.begin())
 			result += ", ";
-		result += i->first + "=>" + i->second;
+		result += to_string(i->first) + "=>" + to_string(i->second);
 	}
 	result += "}";
 	return result;
