@@ -1,14 +1,12 @@
-/*
- * message.h
- *
- *  Created on: Oct 28, 2014
- *      Author: nbingham
- */
+#pragma once
 
 #include "standard.h"
 
-#ifndef common_message_h
-#define common_message_h
+#define KNRM  "\x1B[0m"
+#define KRED  "\x1B[31m"
+#define KGRN  "\x1B[32m"
+#define KYEL  "\x1B[33m"
+#define KBLU  "\x1B[34m"
 
 void internal(string location, string internal, string debug_file, int debug_line);
 void error(string location, string error, string debug_file, int debug_line);
@@ -33,4 +31,3 @@ bool get_debug();
 void set_verbose(bool value);
 bool get_verbose();
 
-#endif
