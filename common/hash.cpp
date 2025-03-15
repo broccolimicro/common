@@ -129,12 +129,11 @@ uint32_t hasher::get()
 	len >>= 2;
 
 	/* Main loop */
-	for (;len > 0; len--)
-	{
+	for (;len > 0; len--) {
 		hash  += (*((const uint16_t *) (ptr)));
 		tmp    = ((*((const uint16_t *) (ptr+2))) << 11) ^ hash;
 		hash   = (hash << 16) ^ tmp;
-		ptr  += 2*sizeof (uint16_t);
+		ptr   += 2*sizeof (uint16_t);
 		hash  += hash >> 11;
 	}
 

@@ -1,21 +1,14 @@
-/*
- * hashmap.h
- *
- *  Created on: Jun 20, 2015
- *      Author: nbingham
- */
+#pragma once
 
 #include <vector>
 #include <list>
 #include <string>
 #include <map>
+#include <array>
 #include <sys/types.h>
 #include <stdint.h>
 
 using namespace std;
-
-#ifndef common_hashmap_h
-#define common_hashmap_h
 
 struct hasher
 {
@@ -117,7 +110,7 @@ struct hasher
 template <class key_type, class value_type, int num_buckets>
 struct hashmap
 {
-	map<key_type, value_type> buckets[num_buckets];
+	array<map<key_type, value_type>, num_buckets> buckets;
 	int count;
 
 	bool insert(const key_type &key, const value_type &value, typename map<key_type, value_type>::iterator* loc = NULL)
@@ -158,7 +151,7 @@ struct hashmap
 template <class value_type, int num_buckets>
 struct hashtable
 {
-	vector<value_type> buckets[num_buckets];
+	array<vector<value_type>, num_buckets> buckets;
 	int count;
 
 	bool insert(const value_type &value, typename vector<value_type>::iterator *loc = NULL)
@@ -208,4 +201,3 @@ struct hashtable
 	}
 };
 
-#endif
