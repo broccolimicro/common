@@ -36,14 +36,14 @@
 // }
 
 // These macros extract the tuple elements.
-#define DECL_MEMBER(method) DECL_MEMBER_ method
 #define DECL_MEMBER_(ret, name, params) ret (T::*name) params;
+#define DECL_MEMBER(method) DECL_MEMBER_ method
 
-#define DECL_METHOD(method) DECL_METHOD_ method
 #define DECL_METHOD_(ret, name, params) template <typename... Args> inline ret name(Args&&... args) const { return (p->*(vt->name))(std::forward<Args>(args)...); }
+#define DECL_METHOD(method) DECL_METHOD_ method
 
-#define INIT_METHOD(method) INIT_METHOD_ method
 #define INIT_METHOD_(ret, name, params) &T::name,
+#define INIT_METHOD(method) INIT_METHOD_ method
 
 // --- FOR_EACH machinery (supports up to 100 methods) ---
 #define FOR_EACH_1(what, x) what(x)
