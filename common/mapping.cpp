@@ -123,6 +123,10 @@ void mapping::reverse_inplace() {
 	nets = reverse().nets;
 }
 
+mapping::operator std::vector<int>() const {
+	return nets;
+}
+
 void mapping::print() const {
 	printf("map{%s", isIdentity ? "identity" : "");
 	for (int i = 0; i < (int)nets.size(); i++) {

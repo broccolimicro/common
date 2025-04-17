@@ -26,6 +26,8 @@ struct mapping {
 	mapping reverse() const;
 	void reverse_inplace();
 
+	operator std::vector<int>() const;
+	
 	void print() const;
 };
 
