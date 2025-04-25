@@ -174,7 +174,7 @@
     FOR_EACH_10, FOR_EACH_9, FOR_EACH_8, FOR_EACH_7, FOR_EACH_6, FOR_EACH_5, FOR_EACH_4, FOR_EACH_3, FOR_EACH_2, FOR_EACH_1 \
   )(action, __VA_ARGS__)
 
-#define INTERFACE(name, ...) \
+#define _INTERFACE_ARG(name, ...) \
 class name { \
 	template <class T> \
 	struct implemented_by { \
@@ -193,6 +193,8 @@ class name { \
 		: vt(reinterpret_cast<const implemented_by<Unknown>*>(&implemented_by<T>::vtable)), \
 		p(reinterpret_cast<Unknown*>(&x)), info(typeid(T)) {} \
 	template <class T> \
+	bool is() { return info == typeid(T); } \
+	template <class T> \
 	operator T*() { assert(info == typeid(T)); return reinterpret_cast<T*>(p); } \
 	template <class T> \
 	operator T&() { assert(info == typeid(T)); return *reinterpret_cast<T*>(p); } \
@@ -202,7 +204,7 @@ const name::implemented_by<T> name::implemented_by<T>::vtable = { \
 	FOR_EACH(INIT_METHOD, __VA_ARGS__) \
 };
 
-#define CONST_INTERFACE(name, ...) \
+#define _CONST_INTERFACE_ARG(name, ...) \
 class name { \
 	template <class T> \
 	struct implemented_by { \
@@ -221,6 +223,8 @@ class name { \
 		: vt(reinterpret_cast<const implemented_by<Unknown>*>(&implemented_by<T>::vtable)), \
 		p(reinterpret_cast<const Unknown*>(&x)), info(typeid(T)) {} \
 	template <class T> \
+	bool is() { return info == typeid(T); } \
+	template <class T> \
 	operator const T*() { assert(info == typeid(T)); return reinterpret_cast<const T*>(p); } \
 	template <class T> \
 	operator const T&() { assert(info == typeid(T)); return *reinterpret_cast<const T*>(p); } \
@@ -230,4 +234,128 @@ const name::implemented_by<T> name::implemented_by<T>::vtable = { \
 	FOR_EACH(INIT_METHOD, __VA_ARGS__) \
 };
 
+#define _INTERFACE(name, ...) \
+class name { \
+	template <class T> \
+	struct implemented_by { \
+		FOR_EACH(DECL_MEMBER, __VA_ARGS__) \
+		static const implemented_by vtable; \
+	}; \
+	/* The interface “object” holds two pointers */ \
+	const implemented_by<Unknown>* vt; \
+	Unknown* p; \
+	const std::type_info *info; \
+	public: \
+	FOR_EACH(DECL_METHOD, __VA_ARGS__) \
+	name() : vt(nullptr), p(nullptr), info(nullptr) {} \
+	name(const name &x) : vt(x.vt), p(x.p), info(x.info) {} \
+	template <class T, std::enable_if_t<!std::is_same_v<std::decay_t<T>, name>, int> = 0> \
+	name(T &x) \
+		: vt(reinterpret_cast<const implemented_by<Unknown>*>(&implemented_by<T>::vtable)), \
+		p(reinterpret_cast<Unknown*>(&x)), info(&typeid(T)) {} \
+	template <class T> \
+	bool is() { return info != nullptr and *info == typeid(T); } \
+	template <class T> \
+	operator T*() { assert(info != nullptr and *info == typeid(T)); return reinterpret_cast<T*>(p); } \
+	template <class T> \
+	operator T&() { assert(info != nullptr and *info == typeid(T)); return *reinterpret_cast<T*>(p); } \
+}; \
+template <class T> \
+const name::implemented_by<T> name::implemented_by<T>::vtable = { \
+	FOR_EACH(INIT_METHOD, __VA_ARGS__) \
+};
+
+#define _CONST_INTERFACE(name, ...) \
+class name { \
+	template <class T> \
+	struct implemented_by { \
+		FOR_EACH(DECL_MEMBER, __VA_ARGS__) \
+		static const implemented_by vtable; \
+	}; \
+	/* The interface “object” holds two pointers */ \
+	const implemented_by<Unknown>* vt; \
+	const Unknown* p; \
+	const std::type_info *info; \
+	public: \
+	FOR_EACH(DECL_METHOD, __VA_ARGS__) \
+	name() : vt(nullptr), p(nullptr), info(nullptr) {} \
+	name(const name &x) : vt(x.vt), p(x.p), info(x.info) {} \
+	template <class T, std::enable_if_t<!std::is_same_v<std::decay_t<T>, name>, int> = 0> \
+	name(T &x) \
+		: vt(reinterpret_cast<const implemented_by<Unknown>*>(&implemented_by<T>::vtable)), \
+		p(reinterpret_cast<const Unknown*>(&x)), info(&typeid(T)) {} \
+	template <class T> \
+	bool is() { return info != nullptr and *info == typeid(T); } \
+	template <class T> \
+	operator const T*() { assert(info != nullptr and *info == typeid(T)); return reinterpret_cast<const T*>(p); } \
+	template <class T> \
+	operator const T&() { assert(info != nullptr and *info == typeid(T)); return *reinterpret_cast<const T*>(p); } \
+}; \
+template <class T> \
+const name::implemented_by<T> name::implemented_by<T>::vtable = { \
+	FOR_EACH(INIT_METHOD, __VA_ARGS__) \
+};
+
 struct Unknown { };
+
+class Interface {
+	Unknown* p;
+	std::type_info *info;
+	public:
+	Interface() : p(nullptr), info(nullptr) {}
+	Interface(const Interface &x) : p(x.p), info(x.info) {}
+	template <class T>
+	Interface(T &x) : p(reinterpret_cast<Unknown*>(&x)), info(&typeid(T)) {}
+	template <class T>
+	bool is() { return info != nullptr and *info == typeid(T); }
+	template <class T>
+	operator T*() { assert(info != nullptr and *info == typeid(T)); return reinterpret_cast<T*>(p); }
+	template <class T>
+	operator T&() { assert(info != nullptr and *info == typeid(T)); return *reinterpret_cast<T*>(p); }
+};
+
+class ConstInterface {
+	const Unknown* p;
+	const std::type_info *info;
+	public:
+	ConstInterface() : p(nullptr), info(nullptr) {}
+	ConstInterface(const ConstInterface &x) : p(x.p), info(x.info) {}
+	template <class T>
+	ConstInterface(T &x) : p(reinterpret_cast<const Unknown*>(&x)), info(&typeid(T)) {}
+	template <class T>
+	bool is() { return info != nullptr and *info == typeid(T); }
+	template <class T>
+	operator T*() { assert(info != nullptr and *info == typeid(T)); return reinterpret_cast<T*>(p); }
+	template <class T>
+	operator T&() { assert(info != nullptr and *info == typeid(T)); return *reinterpret_cast<T*>(p); }
+};
+
+class InterfaceArg {
+	Unknown* const p;
+	std::type_info &info;
+	public:
+	InterfaceArg(const InterfaceArg &x) : p(x.p), info(x.info) {}
+	template <class T>
+	InterfaceArg(T &x) : p(reinterpret_cast<Unknown*>(&x)), info(typeid(T)) {}
+	template <class T>
+	bool is() { return info == typeid(T); }
+	template <class T>
+	operator T*() { assert(info == typeid(T)); return reinterpret_cast<T*>(p); }
+	template <class T>
+	operator T&() { assert(info == typeid(T)); return *reinterpret_cast<T*>(p); }
+};
+
+class ConstInterfaceArg {
+	const Unknown* const p;
+	const std::type_info &info;
+	public:
+	ConstInterfaceArg(const ConstInterfaceArg &x) : p(x.p), info(x.info) {}
+	template <class T>
+	ConstInterfaceArg(T &x) : p(reinterpret_cast<const Unknown*>(&x)), info(typeid(T)) {}
+	template <class T>
+	bool is() { return info == typeid(T); }
+	template <class T>
+	operator T*() { assert(info == typeid(T)); return reinterpret_cast<T*>(p); }
+	template <class T>
+	operator T&() { assert(info == typeid(T)); return *reinterpret_cast<T*>(p); }
+};
