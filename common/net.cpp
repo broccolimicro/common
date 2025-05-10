@@ -75,10 +75,17 @@ Net::Net(vector<Field> fields, int region) {
 	this->region = region;
 }
 
-Net::Net(const char *name, int region) : Net(string(name), region) {
+Net::Net(const char *name) : Net(string(name)) {
 }
 
-Net::Net(string name, int region) {
+Net::Net(string name) {
+	this->region = 0;
+	size_t tic = name.rfind('\'');
+	if (tic != string::npos) {
+		this->region = std::stoi(name.substr(tic+1));
+		name = name.substr(0, tic);
+	}
+
 	if (not name.empty()) {
 		size_t prev = 0u;
 		size_t dot = name.find('.', prev);
@@ -89,7 +96,6 @@ Net::Net(string name, int region) {
 		}
 		fields.push_back(name.substr(prev));
 	}
-	this->region = region;
 }
 
 Net::~Net() {
