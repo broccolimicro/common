@@ -55,6 +55,13 @@ void mapping::identity(int num) {
 }
 
 void mapping::apply(const mapping &m) {
+	if (isIdentity) {
+		isIdentity = m.isIdentity;
+		nets = m.nets;
+	} else if (m.isIdentity) {
+		return;
+	}
+
 	// this: current -> main
 	// m: other -> current
 	// want: other -> main
@@ -62,14 +69,18 @@ void mapping::apply(const mapping &m) {
 	vector<int> updated;
 	updated.reserve(m.nets.size());
 	for (int i = 0; i < (int)m.nets.size(); i++) {
-		updated.push_back(nets[m.nets[i]]);
+		updated.push_back(map(m.map(i)));
 	}
 	nets = updated;
 	isIdentity = isIdentity and m.isIdentity;
 }
 
 void mapping::set(int from, int to) {
-	isIdentity = false;
+	if (isIdentity) {
+		printf("error: set() not supported for identity mapping\n");
+		return;
+	}
+
 	if (from >= (int)nets.size()) {
 		nets.resize(from+1, -1);
 	}
@@ -79,7 +90,11 @@ void mapping::set(int from, int to) {
 }
 
 void mapping::set(vector<int> from, int to) {
-	isIdentity = false;
+	if (isIdentity) {
+		printf("error: set() not supported for identity mapping\n");
+		return;
+	}
+
 	int m = (int)nets.size()-1;
 	for (int i = 0; i < (int)from.size(); i++) {
 		if (from[i] > m) {
@@ -95,7 +110,7 @@ void mapping::set(vector<int> from, int to) {
 }
 
 bool mapping::has(int from) const {
-	return isIdentity or (from >= 0 and from < (int)nets.size() and nets[from] >= 0);
+	return (isIdentity and from >= 0) or (from >= 0 and from < (int)nets.size() and nets[from] >= 0);
 }
 
 int mapping::size() const {
@@ -103,24 +118,35 @@ int mapping::size() const {
 }
 
 mapping mapping::reverse() const {
-	mapping result(isIdentity);
+	if (isIdentity) {
+		// reverse of identity is identity
+		return *this;
+	}
+
+	mapping result = *this;
+	result.reverse_inplace();
+	return result;
+}
+
+void mapping::reverse_inplace() {
+	if (isIdentity) {
+		// reverse of identity is identity
+		return;
+	}
+
 	int hi = 0;
 	for (int i = 0; i < (int)nets.size(); i++) {
 		if (nets[i] > hi) {
 			hi = nets[i];
 		}
 	}
-	result.nets.resize(hi+1, -1);
+	vector<int> updated(hi+1, -1);
 	for (int i = 0; i < (int)nets.size(); i++) {
 		if (nets[i] >= 0) {
-			result.nets[nets[i]] = i;
+			updated[nets[i]] = i;
 		}
 	}
-	return result;
-}
-
-void mapping::reverse_inplace() {
-	nets = reverse().nets;
+	nets = updated;
 }
 
 mapping::operator std::vector<int>() const {
