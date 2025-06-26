@@ -86,13 +86,13 @@ void progress(string location, string log, string debug_file, int debug_line)
 {
 	char str[1024];
 	if (debug && location != "")
-		sprintf(str, "%s:%d:%s: %s", debug_file.c_str(), debug_line, location.c_str(), log.c_str());
+		snprintf(str, sizeof(str), "%s:%d:%s: %s", debug_file.c_str(), debug_line, location.c_str(), log.c_str());
 	else if (debug && location == "")
-		sprintf(str, "%s:%d: %s", debug_file.c_str(), debug_line, log.c_str());
+		snprintf(str, sizeof(str), "%s:%d: %s", debug_file.c_str(), debug_line, log.c_str());
 	else if (!debug && location != "")
-		sprintf(str, "%s: %s", location.c_str(), log.c_str());
+		snprintf(str, sizeof(str), "%s: %s", location.c_str(), log.c_str());
 	else if (!debug && location == "")
-		sprintf(str, "%s", log.c_str());
+		snprintf(str, sizeof(str), "%s", log.c_str());
 	int length = strlen(str);
 	if (progress_length > length)
 		printf("%s%s\r", str, string(progress_length - length, ' ').c_str());

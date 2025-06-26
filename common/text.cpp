@@ -67,15 +67,21 @@ bool sc(char c)
 string to_minstring(float value)
 {
 	static char result[32];
-	sprintf(result, "%g", value);
-	return string(result);
+	int len = snprintf(result, sizeof(result), "%g", value);
+	if (len > 0 && static_cast<size_t>(len) < sizeof(result)) {
+		return string(result);
+	}
+	return string();
 }
 
 string to_minstring(double value)
 {
 	static char result[64];
-	sprintf(result, "%g", value);
-	return string(result);
+	int len = snprintf(result, sizeof(result), "%g", value);
+	if (len > 0 && static_cast<size_t>(len) < sizeof(result)) {
+		return string(result);
+	}
+	return string();
 }
 
 string lower(string str) {
