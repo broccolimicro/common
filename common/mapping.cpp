@@ -1,6 +1,7 @@
 #include "mapping.h"
 
 #include <stdio.h>
+#include <ostream>
 
 using namespace std;
 
@@ -164,3 +165,14 @@ void mapping::print() const {
 	printf("}\n");
 }
 
+std::ostream& operator<<(std::ostream& os, const mapping &m) {
+	os << "map{" << (m.isIdentity ? "identity" : "");
+	for (int i = 0; i < (int)m.nets.size(); i++) {
+		if (i != 0) {
+			os << ", ";
+		}
+		os << i << " -> " << m.nets[i];
+	}
+	os << "}" << std::endl;
+	return os;
+}

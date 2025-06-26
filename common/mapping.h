@@ -29,5 +29,5 @@ struct mapping {
 	operator std::vector<int>() const;
 	
 	void print() const;
+	friend std::ostream& operator<<(std::ostream& os, const mapping &m);
 };
-
