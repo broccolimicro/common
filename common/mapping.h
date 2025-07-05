@@ -1,6 +1,7 @@
 #pragma once
 
 #include <vector>
+#include <ostream>
 
 struct mapping {
 	mapping(bool ident=false);
