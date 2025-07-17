@@ -66,21 +66,21 @@ bool operator==(const Net &v0, const Net &v1);
 bool operator!=(const Net &v0, const Net &v1);
 
 _CONST_INTERFACE_ARG(ConstNetlist,
-	(int, netIndex, (string name) const),
-	(string, netAt, (int uid) const),
-	(int, netCount, () const)
+	(int, netIndex, (string name) const, (name)),
+	(string, netAt, (int uid) const, (uid)),
+	(int, netCount, () const, ())
 )
 
 _INTERFACE_ARG(Netlist,
-	(int, netIndex, (string name, bool define)),
-	(string, netAt, (int uid) const),
-	(int, netCount, () const)
+	(int, netIndex, (string name, bool define), (name, define)),
+	(string, netAt, (int uid) const, (uid)),
+	(int, netCount, () const, ())
 )
 
 _INTERFACE_ARG(SymbolTable,
-	(void, define, (vector<string> typeName, string name, vector<int> size, Netlist nets)),
-	(void, pushScope, ()),
-	(void, popScope, ())
+	(void, define, (vector<string> typeName, string name, vector<int> size, Netlist nets), (typeName, name, size, nets)),
+	(void, pushScope, (), ()),
+	(void, popScope, (), ())
 )
 
 }

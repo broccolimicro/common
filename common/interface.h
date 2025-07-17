@@ -36,13 +36,14 @@
 // }
 
 // These macros extract the tuple elements.
-#define DECL_MEMBER_(ret, name, params) ret (T::*name) params;
+#define DECL_MEMBER_(ret, name, params, args) ret (T::*name) params;
 #define DECL_MEMBER(method) DECL_MEMBER_ method
 
-#define DECL_METHOD_(ret, name, params) template <typename... Args> inline ret name(Args&&... args) const { return (p->*(vt->name))(std::forward<Args>(args)...); }
+//#define DECL_METHOD_(ret, name, params) template <typename... Args> inline ret name(Args&&... args) const { return (p->*(vt->name))(std::forward<Args>(args)...); }
+#define DECL_METHOD_(ret, name, params, args) inline ret name params { return (p->*(vt->name)) args; }
 #define DECL_METHOD(method) DECL_METHOD_ method
 
-#define INIT_METHOD_(ret, name, params) &T::name,
+#define INIT_METHOD_(ret, name, params, args) &T::name,
 #define INIT_METHOD(method) INIT_METHOD_ method
 
 // --- FOR_EACH machinery (supports up to 100 methods) ---
@@ -195,9 +196,7 @@
 		template <class T> \
 		bool is() { return info == typeid(T); } \
 		template <class T> \
-		operator T*() { assert(info == typeid(T)); return reinterpret_cast<T*>(p); } \
-		template <class T> \
-		operator T&() { assert(info == typeid(T)); return *reinterpret_cast<T*>(p); } \
+		T &cast() { assert(info == typeid(T)); return *reinterpret_cast<T*>(p); } \
 	}; \
 	template <class T> \
 	const name::implemented_by<T> name::implemented_by<T>::vtable = { \
@@ -225,9 +224,7 @@
 		template <class T> \
 		bool is() { return info == typeid(T); } \
 		template <class T> \
-		operator const T*() { assert(info == typeid(T)); return reinterpret_cast<const T*>(p); } \
-		template <class T> \
-		operator const T&() { assert(info == typeid(T)); return *reinterpret_cast<const T*>(p); } \
+		const T &cast() { assert(info == typeid(T)); return *reinterpret_cast<const T*>(p); } \
 	}; \
 	template <class T> \
 	const name::implemented_by<T> name::implemented_by<T>::vtable = { \
@@ -256,9 +253,7 @@
 		template <class T> \
 		bool is() { return info != nullptr and *info == typeid(T); } \
 		template <class T> \
-		operator T*() { assert(info != nullptr and *info == typeid(T)); return reinterpret_cast<T*>(p); } \
-		template <class T> \
-		operator T&() { assert(info != nullptr and *info == typeid(T)); return *reinterpret_cast<T*>(p); } \
+		T &cast() { assert(info != nullptr and *info == typeid(T)); return *reinterpret_cast<T*>(p); } \
 	}; \
 	template <class T> \
 	const name::implemented_by<T> name::implemented_by<T>::vtable = { \
@@ -287,9 +282,7 @@
 		template <class T> \
 		bool is() { return info != nullptr and *info == typeid(T); } \
 		template <class T> \
-		operator const T*() { assert(info != nullptr and *info == typeid(T)); return reinterpret_cast<const T*>(p); } \
-		template <class T> \
-		operator const T&() { assert(info != nullptr and *info == typeid(T)); return *reinterpret_cast<const T*>(p); } \
+		const T &cast() { assert(info != nullptr and *info == typeid(T)); return *reinterpret_cast<const T*>(p); } \
 	}; \
 	template <class T> \
 	const name::implemented_by<T> name::implemented_by<T>::vtable = { \
@@ -309,9 +302,7 @@ class Interface {
 	template <class T>
 		bool is() { return info != nullptr and *info == typeid(T); }
 	template <class T>
-		operator T*() { assert(info != nullptr and *info == typeid(T)); return reinterpret_cast<T*>(p); }
-	template <class T>
-		operator T&() { assert(info != nullptr and *info == typeid(T)); return *reinterpret_cast<T*>(p); }
+		T &cast() { assert(info != nullptr and *info == typeid(T)); return *reinterpret_cast<T*>(p); }
 };
 
 class ConstInterface {
@@ -325,9 +316,7 @@ class ConstInterface {
 	template <class T>
 		bool is() { return info != nullptr and *info == typeid(T); }
 	template <class T>
-		operator T*() { assert(info != nullptr and *info == typeid(T)); return reinterpret_cast<T*>(p); }
-	template <class T>
-		operator T&() { assert(info != nullptr and *info == typeid(T)); return *reinterpret_cast<T*>(p); }
+		T &cast() { assert(info != nullptr and *info == typeid(T)); return *reinterpret_cast<T*>(p); }
 };
 
 class InterfaceArg {
@@ -340,9 +329,7 @@ class InterfaceArg {
 	template <class T>
 		bool is() { return info == typeid(T); }
 	template <class T>
-		operator T*() { assert(info == typeid(T)); return reinterpret_cast<T*>(p); }
-	template <class T>
-		operator T&() { assert(info == typeid(T)); return *reinterpret_cast<T*>(p); }
+		T &cast() { assert(info == typeid(T)); return *reinterpret_cast<T*>(p); }
 };
 
 class ConstInterfaceArg {
@@ -355,7 +342,5 @@ class ConstInterfaceArg {
 	template <class T>
 		bool is() { return info == typeid(T); }
 	template <class T>
-		operator T*() { assert(info == typeid(T)); return reinterpret_cast<T*>(p); }
-	template <class T>
-		operator T&() { assert(info == typeid(T)); return *reinterpret_cast<T*>(p); }
+		T &cast() { assert(info == typeid(T)); return *reinterpret_cast<T*>(p); }
 };
