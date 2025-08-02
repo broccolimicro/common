@@ -100,10 +100,14 @@ struct index_vector {
 	}
 
 	size_type capacity() const {
-		return elems.size();
+		return elems.capacity();
 	}
 
 	size_type size() const {
+		return elems.size();
+	}
+
+	size_type count() const {
 		return elems.size() - free.size();
 	}
 
@@ -264,4 +268,24 @@ struct index_vector {
 	const_reverse_iterator rbegin() const { return const_reverse_iterator(this, elems.size() ? elems.size() - 1 : size_type(-1)); }
 	const_reverse_iterator rend() const   { return const_reverse_iterator(this, size_type(-1)); }
 };
+
+template <typename T>
+size_t operator-(typename index_vector<T>::iterator a, typename index_vector<T>::iterator b) {
+	return a.index - b.index;
+}
+
+template <typename T>
+size_t operator-(typename index_vector<T>::const_iterator a, typename index_vector<T>::const_iterator b) {
+	return a.index - b.index;
+}
+
+template <typename T>
+size_t operator-(typename index_vector<T>::reverse_iterator a, typename index_vector<T>::reverse_iterator b) {
+	return a.index - b.index;
+}
+
+template <typename T>
+size_t operator-(typename index_vector<T>::const_reverse_iterator a, typename index_vector<T>::const_reverse_iterator b) {
+	return a.index - b.index;
+}
 
