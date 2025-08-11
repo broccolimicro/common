@@ -79,6 +79,14 @@ struct index_vector {
 		return i < valid.size() and valid[i];
 	}
 
+	bool is_valid(typename vector<T>::iterator i) const {
+		return is_valid(i-elems.begin());
+	}
+
+	bool is_valid(typename vector<T>::const_iterator i) const {
+		return is_valid(i-elems.begin());
+	}
+
 	T& at(size_type i) {
 		if (not is_valid(i)) throw std::out_of_range("index_vector::at() invalid index");
 		return elems[i];
