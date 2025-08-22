@@ -119,7 +119,8 @@ string Net::to_string() const {
 }
 
 const char *Net::c_str() const {
-	return to_string().c_str();
+	this->_c_str_cache = this->to_string();
+	return this->_c_str_cache.c_str();
 }
 
 bool Net::empty() const {

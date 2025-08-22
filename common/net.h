@@ -49,6 +49,7 @@ struct Net {
 	int region;
 
 	string to_string() const;
+	mutable std::string _c_str_cache;
 	const char *c_str() const;
 	bool empty() const;
 
