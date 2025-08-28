@@ -79,11 +79,11 @@ struct index_vector {
 		return i < valid.size() and valid[i];
 	}
 
-	bool is_valid(typename vector<T>::iterator i) const {
+	bool is_valid(typename std::vector<T>::iterator i) const {
 		return is_valid(i-elems.begin());
 	}
 
-	bool is_valid(typename vector<T>::const_iterator i) const {
+	bool is_valid(typename std::vector<T>::const_iterator i) const {
 		return is_valid(i-elems.begin());
 	}
 
