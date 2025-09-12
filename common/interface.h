@@ -188,13 +188,15 @@
 		const std::type_info &info; \
 		public: \
 						FOR_EACH(DECL_METHOD, __VA_ARGS__) \
+		name() : vt(nullptr), p(nullptr), info(typeid(void)) {} \
 		name(const name &x) : vt(x.vt), p(x.p), info(x.info) {} \
 		template <class T, std::enable_if_t<!std::is_same_v<std::decay_t<T>, name>, int> = 0> \
 		name(T &x) \
 		: vt(reinterpret_cast<const implemented_by<Unknown>*>(&implemented_by<T>::vtable)), \
 		p(reinterpret_cast<Unknown*>(&x)), info(typeid(T)) {} \
+		bool empty() const { return p == nullptr; } \
 		template <class T> \
-		bool is() { return info == typeid(T); } \
+		bool is() const { return info == typeid(T); } \
 		template <class T> \
 		T &cast() { assert(info == typeid(T)); return *reinterpret_cast<T*>(p); } \
 	}; \
@@ -216,13 +218,15 @@
 		const std::type_info &info; \
 		public: \
 						FOR_EACH(DECL_METHOD, __VA_ARGS__) \
+		name() : vt(nullptr), p(nullptr), info(typeid(void)) {} \
 		name(const name &x) : vt(x.vt), p(x.p), info(x.info) {} \
 		template <class T, std::enable_if_t<!std::is_same_v<std::decay_t<T>, name>, int> = 0> \
 		name(T &x) \
 		: vt(reinterpret_cast<const implemented_by<Unknown>*>(&implemented_by<T>::vtable)), \
 		p(reinterpret_cast<const Unknown*>(&x)), info(typeid(T)) {} \
+		bool empty() const { return p == nullptr; } \
 		template <class T> \
-		bool is() { return info == typeid(T); } \
+		bool is() const { return info == typeid(T); } \
 		template <class T> \
 		const T &cast() { assert(info == typeid(T)); return *reinterpret_cast<const T*>(p); } \
 	}; \
@@ -250,8 +254,9 @@
 		name(T &x) \
 		: vt(reinterpret_cast<const implemented_by<Unknown>*>(&implemented_by<T>::vtable)), \
 		p(reinterpret_cast<Unknown*>(&x)), info(&typeid(T)) {} \
+		bool empty() const { return p == nullptr; } \
 		template <class T> \
-		bool is() { return info != nullptr and *info == typeid(T); } \
+		bool is() const { return info != nullptr and *info == typeid(T); } \
 		template <class T> \
 		T &cast() { assert(info != nullptr and *info == typeid(T)); return *reinterpret_cast<T*>(p); } \
 	}; \
@@ -279,8 +284,9 @@
 		name(T &x) \
 		: vt(reinterpret_cast<const implemented_by<Unknown>*>(&implemented_by<T>::vtable)), \
 		p(reinterpret_cast<const Unknown*>(&x)), info(&typeid(T)) {} \
+		bool empty() const { return p == nullptr; } \
 		template <class T> \
-		bool is() { return info != nullptr and *info == typeid(T); } \
+		bool is() const { return info != nullptr and *info == typeid(T); } \
 		template <class T> \
 		const T &cast() { assert(info != nullptr and *info == typeid(T)); return *reinterpret_cast<const T*>(p); } \
 	}; \
@@ -299,8 +305,9 @@ class Interface {
 	Interface(const Interface &x) : p(x.p), info(x.info) {}
 	template <class T>
 		Interface(T &x) : p(reinterpret_cast<Unknown*>(&x)), info(const_cast<std::type_info*>(&typeid(T))) {}
+	bool empty() const { return p == nullptr; }
 	template <class T>
-		bool is() { return info != nullptr and *info == typeid(T); }
+		bool is() const { return info != nullptr and *info == typeid(T); }
 	template <class T>
 		T &cast() { assert(info != nullptr and *info == typeid(T)); return *reinterpret_cast<T*>(p); }
 };
@@ -313,21 +320,24 @@ class ConstInterface {
 	ConstInterface(const ConstInterface &x) : p(x.p), info(x.info) {}
 	template <class T>
 		ConstInterface(T &x) : p(reinterpret_cast<const Unknown*>(&x)), info(&typeid(T)) {}
+	bool empty() const { return p == nullptr; }
 	template <class T>
-		bool is() { return info != nullptr and *info == typeid(T); }
+		bool is() const { return info != nullptr and *info == typeid(T); }
 	template <class T>
 		T &cast() { assert(info != nullptr and *info == typeid(T)); return *reinterpret_cast<T*>(p); }
 };
 
 class InterfaceArg {
 	Unknown* const p;
-	std::type_info &info;
+	const std::type_info &info;
 	public:
+	InterfaceArg() : p(nullptr), info(typeid(void)) {}
 	InterfaceArg(const InterfaceArg &x) : p(x.p), info(x.info) {}
 	template <class T>
-		InterfaceArg(T &x) : p(reinterpret_cast<Unknown*>(&x)), info(*const_cast<std::type_info*>(&typeid(T))) {}
+		InterfaceArg(T &x) : p(reinterpret_cast<Unknown*>(&x)), info(typeid(T)) {}
+	bool empty() const { return p == nullptr; }
 	template <class T>
-		bool is() { return info == typeid(T); }
+		bool is() const { return info == typeid(T); }
 	template <class T>
 		T &cast() { assert(info == typeid(T)); return *reinterpret_cast<T*>(p); }
 };
@@ -336,11 +346,13 @@ class ConstInterfaceArg {
 	const Unknown* const p;
 	const std::type_info &info;
 	public:
+	ConstInterfaceArg() : p(nullptr), info(typeid(void)) {}
 	ConstInterfaceArg(const ConstInterfaceArg &x) : p(x.p), info(x.info) {}
 	template <class T>
 		ConstInterfaceArg(T &x) : p(reinterpret_cast<const Unknown*>(&x)), info(typeid(T)) {}
+	bool empty() const { return p == nullptr; }
 	template <class T>
-		bool is() { return info == typeid(T); }
+		bool is() const { return info == typeid(T); }
 	template <class T>
 		T &cast() { assert(info == typeid(T)); return *reinterpret_cast<T*>(p); }
 };
