@@ -22,16 +22,7 @@
 // mapping identity -> {1 -> 5, 2 -> 7, 3 -> 7}
 template <typename T>
 struct Mapping {
-	Mapping() {
-		this->identity = true;
-	}
-
-	Mapping(T undef) {
-		this->identity = false;
-		this->undef = undef;
-	}
-
-	Mapping(bool identity, T undef=T()) {
+	Mapping(T undef=T(), bool identity = true) {
 		this->identity = identity;
 		this->undef = undef;
 	}
@@ -75,6 +66,21 @@ struct Mapping {
 		}
 	}
 
+	void update(T from, T to) {
+		for (auto i = fwd.begin(); i != fwd.end();) {
+			if (i->second == from) {
+				i->second = to;
+			}
+			if (not identity and i->second == undef) {
+				i = fwd.erase(i);
+			} else {
+				++i;
+			}
+		}
+
+		fwd.insert({from, to});
+	}
+
 	T unmap(T to) const {
 		for (auto i = fwd.begin(); i != fwd.end(); i++) {
 			if (i->second == to) {
@@ -97,12 +103,53 @@ struct Mapping {
 		return undef;
 	}
 
+	std::vector<T> map(std::vector<T> from) const {
+		std::vector<T> result;
+		for (auto i = from.begin(); i != from.end(); i++) {
+			auto pos = fwd.find(*i);
+			if (pos != fwd.end()) {
+				if (pos->second != undef) {
+					result.push_back(pos->second);
+				}
+			} else if (identity) {
+				result.push_back(from);
+			}
+		}
+		return result;
+	}
+
+	std::vector<T> mapUniq(std::vector<T> from) const {
+		std::vector<T> result;
+		for (auto i = from.begin(); i != from.end(); i++) {
+			auto pos = fwd.find(*i);
+			if (pos != fwd.end()) {
+				if (pos->second != undef) {
+					result.push_back(pos->second);
+				}
+			} else if (identity) {
+				result.push_back(from);
+			}
+		}
+		sort(result.begin(), result.end());
+		result.erase(unique(result.begin(), result.end()), result.end());
+		return result;
+	}
+
 	bool has(T from) const {
-		return fwd.find(from) != fwd.end() or identity;
+		auto pos = fwd.find(from);
+		if ((identity and pos == fwd.end()) or pos->second == from) {
+			return true;
+		}
+		for (auto i = fwd.begin(); i != fwd.end(); i++) {
+			if (i->second == from) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 	Mapping flip() const {
-		Mapping result(identity, undef);
+		Mapping result(undef, identity);
 		for (auto i = fwd.begin(); i != fwd.end(); i++) {
 			result.set(i->second, i->first);
 		}
@@ -121,9 +168,10 @@ struct Mapping {
 	}
 
 	Mapping<T> &operator*=(const Mapping<T> &m) {
+		identity = identity and m.identity;
 		for (auto i = fwd.begin(); i != fwd.end();) {
 			i->second = m.map(i->second);
-			if (not identity and i->second == undef) {
+			if (i->second == (identity ? i->first : undef)) {
 				i = fwd.erase(i);
 			} else {
 				++i;
