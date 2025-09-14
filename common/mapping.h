@@ -3,6 +3,7 @@
 #include <vector>
 #include <map>
 #include <ostream>
+#include "message.h"
 
 // Mapping is used to transform from one index space to another.  If you are
 // applying iterative transformations to a single thing, then create separate
@@ -112,7 +113,7 @@ struct Mapping {
 					result.push_back(pos->second);
 				}
 			} else if (identity) {
-				result.push_back(from);
+				result.push_back(*i);
 			}
 		}
 		return result;
@@ -135,23 +136,47 @@ struct Mapping {
 		return result;
 	}
 
-	bool has(T from) const {
-		auto pos = fwd.find(from);
-		if ((identity and pos == fwd.end()) or pos->second == from) {
+	bool mapsTo(T t) const {
+		auto pos = fwd.find(t);
+		if ((identity and pos == fwd.end()) or pos->second == t) {
 			return true;
 		}
 		for (auto i = fwd.begin(); i != fwd.end(); i++) {
-			if (i->second == from) {
+			if (i->second == t) {
 				return true;
 			}
 		}
 		return false;
 	}
 
+	bool mapsFrom(T t) const {
+		if (identity) {
+			return true;
+		}
+		return fwd.find(t) != fwd.end();
+	}
+
+	bool isBijective() const {
+		std::set<T> from;
+		std::set<T> to;
+		for (auto i = fwd.begin(); i != fwd.end(); i++) {
+			if (identity) {
+				from.insert(i->first);
+			}
+			if (not to.insert(i->second).second) {
+				return true;
+			}
+		}
+		return identity and not equal(to.begin(), to.end(), from.begin(), from.end());
+	}
+
 	Mapping flip() const {
 		Mapping result(undef, identity);
 		for (auto i = fwd.begin(); i != fwd.end(); i++) {
-			result.set(i->second, i->first);
+			auto pos = result.fwd.insert({i->second, i->first});
+			if (not pos.second) {
+				internal("", "unable to flip mapping with overlapping assignments", __FILE__, __LINE__);
+			}
 		}
 		return result;
 	}
@@ -209,3 +234,86 @@ std::ostream &operator<<(std::ostream &os, const Mapping<T> &m) {
 	os << "}" << std::endl;
 	return os;
 }
+
+/*template <typename T>
+struct MappingBidir {
+	MappingBidir(T undef=T(), bool identity = true) : fwd(undef, identity), bwd(undef, identity) {
+	}
+
+	~MappingBidir() {
+	}
+
+	Mapping<T> fwd;
+	Mapping<T> bwd;
+
+	void set(T from, T to) {
+		fwd.set(from, to);
+		bwd.set(to, from);
+	}
+
+	void set(std::initializer_list<std::pair<T, T> > m) {
+		for (auto i = m.begin(); i != m.end(); i++) {
+			fwd.set(i->first, i->second);
+			bwd.set(i->second, i->first);
+		}
+	}
+
+	void set(std::map<T, T> m) {
+		for (auto i = m.begin(); i != m.end(); i++) {
+			fwd.set(i->first, i->second);
+			bwd.set(i->second, i->first);
+		}
+	}
+
+	void update(T from, T to) {
+		fwd.update(from, to);
+		bwd.update(to, from);
+	}
+
+	T unmap(T to) const {
+		return bwd.map(to);
+	}
+	
+	T map(T from) const {
+		return fwd.map(from);
+	}
+
+	std::vector<T> map(std::vector<T> from) const {
+		return fwd.map(from);
+	}
+
+	std::vector<T> mapUniq(std::vector<T> from) const {
+		return fwd.mapUniq(from);
+	}
+
+	bool mapsTo(T t) const {
+		return bwd.mapsFrom(t);
+	}
+
+	bool mapsFrom(T t) const {
+		return fwd.mapsFrom(t);
+	}
+
+	MappingBidir flip() const {
+		MappingBidir result(undef, identity);
+		result.fwd = bwd;
+		result.bwd = fwd;
+		return result;
+	}
+
+	T operator[](T from) const {
+		return fwd.map(from);
+	}
+
+	MappingBidir<T> &operator+=(const Mapping<T> &m) {
+		fwd += m;
+		bwd = m.flip() + bwd;
+		return *this;
+	}
+
+	MappingBidir<T> &operator*=(const Mapping<T> &m) {
+		fwd *= m;
+		bwd = m.flip()*bwd;
+		return *this;
+	}
+};*/

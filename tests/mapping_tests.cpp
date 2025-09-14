@@ -75,9 +75,9 @@ TEST(MappingTest, SetFunctions) {
 	}
 	
 	// Test the has function
-	EXPECT_TRUE(not m.has(0));
-	EXPECT_TRUE(not m.has(3));
-	EXPECT_FALSE(not m.has(10));  // 10 is a value, not an index
+	EXPECT_TRUE(not m.mapsTo(0));
+	EXPECT_TRUE(not m.mapsTo(3));
+	EXPECT_FALSE(not m.mapsTo(10));  // 10 is a value, not an index
 }
 
 // Test size and reverse functions
