@@ -170,6 +170,33 @@ struct Mapping {
 		return identity and not equal(to.begin(), to.end(), from.begin(), from.end());
 	}
 
+	size_t toSize() const {
+		std::set<T> to;
+		size_t result = 0;
+		for (auto i = fwd.begin(); i != fwd.end(); i++) {
+			result += (size_t)to.insert(i->second).second;
+		}
+		return result;
+	}
+
+	size_t fromSize() const {
+		return fwd.size();
+	}
+
+	T toMax() const {
+		auto i = fwd.begin();
+		if (i == fwd.end()) {
+			return T();
+		}
+		T result = i->second;
+		for (++i; i != fwd.end(); i++) {
+			if (i->second > result) {
+				result = i->second;
+			}
+		}
+		return result;
+	}
+
 	Mapping flip() const {
 		Mapping result(undef, identity);
 		for (auto i = fwd.begin(); i != fwd.end(); i++) {
@@ -226,7 +253,7 @@ template <typename T>
 std::ostream &operator<<(std::ostream &os, const Mapping<T> &m) {
 	os << "map " << (m.identity ? "identity" : "reset") << " -> {";
 	for (auto i = m.fwd.begin(); i != m.fwd.end(); i++) {
-		if (i != 0) {
+		if (i != m.fwd.begin()) {
 			os << ", ";
 		}
 		os << i->first << " -> " << i->second;
