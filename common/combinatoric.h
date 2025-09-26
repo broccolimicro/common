@@ -3,17 +3,28 @@
 #include <vector>
 
 struct CombinatoricIterator {
-	std::vector<int> indices;
-	int n, k;
+	std::vector<size_t> indices;
+	size_t n, k;
+	bool valid;
 
-	CombinatoricIterator(int n, int k);
+	CombinatoricIterator(size_t n, size_t k);
 	~CombinatoricIterator();
 
-	std::vector<int>::iterator begin();
-	std::vector<int>::iterator end();
+	std::vector<size_t>::const_iterator begin() const;
+	std::vector<size_t>::const_iterator end() const;
 
+	size_t size() const;
+	bool done() const;
+
+	size_t operator[](size_t i) const;
+
+	// resulting indices are ordered
 	bool nextShift();
+
+	// resulting indices are ordered
 	bool nextComb();
+
+
 	bool nextPerm();
 };
 
