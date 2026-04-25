@@ -147,6 +147,42 @@ string line_wrap(string str, int length)
 	return result;
 }
 
+std::vector<std::string> splitArguments(const std::string& input) {
+	std::vector<std::string> args;
+	std::string current;
+	bool inSingleQuotes = false;
+	bool inDoubleQuotes = false;
+	bool inEscape = false;
+
+	for (size_t i = 0; i < input.size(); i++) {
+		char c = input[i];
+
+		if (inEscape) {
+			current += c;
+			inEscape = false;
+		} else if (c == '\\') {
+			inEscape = true;
+		} else if (c == '\'' && !inDoubleQuotes) {
+			inSingleQuotes = !inSingleQuotes;
+		} else if (c == '"' && !inSingleQuotes) {
+			inDoubleQuotes = !inDoubleQuotes;
+		} else if (isspace(c) && !inSingleQuotes && !inDoubleQuotes) {
+			if (!current.empty()) {
+				args.push_back(current);
+				current.clear();
+			}
+		} else {
+			current += c;
+		}
+	}
+
+	if (!current.empty()) {
+		args.push_back(current);
+	}
+
+	return args;
+}
+
 // Function to find the first unescaped space
 size_t findFirstUnescapedSpace(const std::string& str) {
 	bool inEscape = false;
