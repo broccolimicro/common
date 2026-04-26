@@ -97,3 +97,4 @@ size_t findFirstUnescapedSpace(const std::string& str);
 std::string extractPath(const std::string& input);
 std::string escapePath(const std::string &input);
 
+string encodeBase32(size_t id);

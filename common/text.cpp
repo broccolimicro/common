@@ -231,3 +231,17 @@ std::string escapePath(const std::string &input) {
 	return result;
 }
 
+string encodeBase32(size_t id) {
+	// spice names are not sensitive to capitalization, and only support alphanum
+	// characters. Not enough character types to support base64.
+	static const string digits = "abcdefghijklmnopqrstuvwxyz012345";
+
+	std::string result;
+	for (int i = 0; i < (int)sizeof(size_t); i++) {
+		int idx = id & 0x1F;
+		id >>= 5;
+		result.push_back(digits[idx]);
+	}
+	return result;
+}
+

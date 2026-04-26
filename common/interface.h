@@ -175,6 +175,8 @@
 			FOR_EACH_10, FOR_EACH_9, FOR_EACH_8, FOR_EACH_7, FOR_EACH_6, FOR_EACH_5, FOR_EACH_4, FOR_EACH_3, FOR_EACH_2, FOR_EACH_1 \
 			)(action, __VA_ARGS__)
 
+// Not copyable
+// Remappable
 #define _INTERFACE_ARG(name, ...) \
 	class name { \
 		template <class T> \
@@ -205,6 +207,8 @@
 		FOR_EACH(INIT_METHOD, __VA_ARGS__) \
 	};
 
+// Not copyable
+// Not remappable
 #define _CONST_INTERFACE_ARG(name, ...) \
 	class name { \
 		template <class T> \
@@ -235,6 +239,8 @@
 		FOR_EACH(INIT_METHOD, __VA_ARGS__) \
 	};
 
+// Copyable
+// Remappable
 #define _INTERFACE(name, ...) \
 	class name { \
 		template <class T> \
@@ -265,6 +271,8 @@
 		FOR_EACH(INIT_METHOD, __VA_ARGS__) \
 	};
 
+// Copyable
+// Not remappable
 #define _CONST_INTERFACE(name, ...) \
 	class name { \
 		template <class T> \
