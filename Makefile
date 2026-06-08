@@ -1,5 +1,5 @@
 NAME          = common
-DEPEND        = 
+DEPEND        =
 TEST_DEPEND   =
 
 COVERAGE ?= 0
@@ -9,7 +9,7 @@ CXXFLAGS = -std=c++20 -g -Wall -fmessage-length=0 -O2
 LDFLAGS  =
 else
 CXXFLAGS = -std=c++20 -g -Wall -fmessage-length=0 -O0 --coverage -fprofile-arcs -ftest-coverage
-LDFLAGS  = --coverage -fprofile-arcs -ftest-coverage 
+LDFLAGS  = --coverage -fprofile-arcs -ftest-coverage
 endif
 
 SRCDIR        = $(NAME)
@@ -86,10 +86,10 @@ coverage: clean
 $(TARGET): $(OBJECTS)
 	ar rvs $(TARGET) $(OBJECTS)
 
-build/$(SRCDIR)/%.o: $(SRCDIR)/%.cpp 
+build/$(SRCDIR)/%.o: $(SRCDIR)/%.cpp
 	@mkdir -p $(dir $@)
 	@$(CXX) $(CXXFLAGS) $(LDFLAGS) $(INCLUDE_PATHS) -MM -MF $(patsubst %.o,%.d,$@) -MT $@ $<
-	$(CXX) $(CXXFLAGS) $(LDFLAGS) $(INCLUDE_PATHS) -c -o $@ $< 
+	$(CXX) $(CXXFLAGS) $(LDFLAGS) $(INCLUDE_PATHS) -c -o $@ $<
 
 $(TEST_TARGET): $(TEST_OBJECTS) $(OBJECTS) $(TARGET)
 	$(CXX) $(CXXFLAGS) $(LDFLAGS) $(TEST_LIBRARY_PATHS) $(TEST_OBJECTS) $(TEST_LIBRARIES) -o $(TEST_TARGET)
