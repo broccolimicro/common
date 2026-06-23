@@ -98,3 +98,4 @@ std::string extractPath(const std::string& input);
 std::string escapePath(const std::string &input);
 
 string encodeBase32(size_t id);
+size_t decodeBase32(const string &str);

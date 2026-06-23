@@ -245,3 +245,18 @@ string encodeBase32(size_t id) {
 	return result;
 }
 
+size_t decodeBase32(const string &str) {
+	static const std::string digits = "abcdefghijklmnopqrstuvwxyz012345";
+
+	size_t result = 0;
+	for (int i = std::min<int>(str.size(), sizeof(size_t)) - 1; i >= 0; --i) {
+		auto idx = digits.find(str[i]);
+		if (idx == std::string::npos) {
+			throw std::invalid_argument("invalid base32 character");
+		}
+
+		result <<= 5;
+		result |= idx;
+	}
+	return result;
+}
