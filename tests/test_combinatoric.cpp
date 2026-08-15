@@ -63,3 +63,55 @@ TEST(CombinatoricIteratorTest, NextPermFullEnumeration) {
 	EXPECT_EQ(count, nChooseK(n, k) * factorial(k));
 }
 
+TEST(CombinatoricIteratorTest, CompositionFullEnumeration) {
+	size_t v = 5, n = 3;
+	size_t count = 0;
+
+	vector<vector<size_t>> expected = {
+		{1, 1, 3},
+		{1, 2, 2},
+		{1, 3, 1},
+		{2, 1, 2},
+		{2, 2, 1},
+		{3, 1, 1}
+	};
+
+	for (CombinatoricIterator it = CombinatoricIterator::Composition(v, n);
+		not it.done();
+		it.nextComb()) {
+
+		vector<size_t> composition = it.getComposition();
+
+		cout << ::to_string(composition) << endl;
+
+		EXPECT_EQ(composition.size(), n);
+
+		size_t sum = 0;
+		for (size_t value : composition) {
+			EXPECT_GT(value, 0u);
+			sum += value;
+		}
+
+		EXPECT_EQ(sum, v);
+		EXPECT_EQ(composition, expected[count]);
+
+		count++;
+	}
+
+	EXPECT_EQ(count, nChooseK(v - 1, n - 1));
+}
+
+TEST(CombinatoricIteratorTest, CompositionSingleElement) {
+	size_t v = 7;
+	CombinatoricIterator it = CombinatoricIterator::Composition(v, 1);
+
+	ASSERT_FALSE(it.done());
+
+	vector<size_t> composition = it.getComposition();
+
+	ASSERT_EQ(composition.size(), 1u);
+	EXPECT_EQ(composition[0], v);
+
+	EXPECT_FALSE(it.nextComb());
+	EXPECT_TRUE(it.done());
+}

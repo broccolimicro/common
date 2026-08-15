@@ -13,6 +13,10 @@ CombinatoricIterator::CombinatoricIterator(size_t n, size_t k) : n(n), k(k) {
 CombinatoricIterator::~CombinatoricIterator() {
 }
 
+CombinatoricIterator CombinatoricIterator::Composition(size_t v, size_t n) {
+	return CombinatoricIterator(v-1, n-1);
+}
+
 std::vector<size_t>::const_iterator CombinatoricIterator::begin() const {
 	return indices.begin();
 }
@@ -33,6 +37,28 @@ size_t CombinatoricIterator::operator[](size_t i) const {
 	return indices[i];
 }
 
+std::vector<size_t> CombinatoricIterator::get(bool sorted) const {
+	std::vector<size_t> result(indices.begin(), indices.begin() + k);
+	if (sorted) {
+		sort(result.begin(), result.end());
+	}
+	return result;
+}
+
+std::vector<size_t> CombinatoricIterator::getComposition() const {
+	std::vector<size_t> result(k+1);
+	if (k > 0) {
+		result[0] = indices[0] + 1;
+		for (size_t i = 1; i < k; ++i) {
+			result[i] = indices[i] - indices[i-1];
+		}
+		result[k] = n-indices[k-1];
+	} else {
+		result[0] = n+1;
+	}
+	return result;
+}
+
 bool CombinatoricIterator::nextShift() {
 	if (indices[0] >= n-k) {
 		valid = false;
@@ -46,7 +72,7 @@ bool CombinatoricIterator::nextShift() {
 }
 
 bool CombinatoricIterator::nextComb() {
-	if (indices[0] >= n-k) {
+	if (k == 0 or indices[0] >= n-k) {
 		valid = false;
 		return false;
 	}

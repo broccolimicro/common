@@ -85,6 +85,16 @@ bool vector_intersects(const vector<T> &v1, const vector<T> &v2)
 }
 
 template <typename T>
+bool vector_intersects_unsorted(const vector<T> &v1, const vector<T> &v2) {
+	for (const T &t : v1) {
+		if (find(v2.begin(), v2.end(), t) != v2.end()) {
+			return true;
+		}
+	}
+	return false;
+}
+
+template <typename T>
 bool vector_is_subset_of(const vector<T> &v1, const vector<T> &v2)
 {
 	typename vector<T>::const_iterator i = v1.begin(), j = v2.begin();
