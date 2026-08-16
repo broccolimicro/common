@@ -115,3 +115,88 @@ TEST(CombinatoricIteratorTest, CompositionSingleElement) {
 	EXPECT_FALSE(it.nextComb());
 	EXPECT_TRUE(it.done());
 }
+
+TEST(PartitionIteratorTest, FullEnumeration) {
+	size_t n = 4;
+	size_t k = 2;
+
+	PartitionIterator it(n, k);
+
+	size_t count = 0;
+
+	while (not it.done()) {
+		vector<vector<size_t>> partition = it.get();
+
+		cout << ::to_string(partition) << endl;
+
+		ASSERT_EQ(partition.size(), k);
+
+		vector<bool> seen(n, false);
+
+		for (size_t group = 0; group < k; ++group) {
+			EXPECT_FALSE(partition[group].empty());
+
+			for (size_t element : partition[group]) {
+				ASSERT_LT(element, n);
+				EXPECT_FALSE(seen[element]);
+				seen[element] = true;
+			}
+		}
+
+		for (size_t element = 0; element < n; ++element) {
+			EXPECT_TRUE(seen[element]);
+		}
+
+		count++;
+		it.nextPart();
+	}
+
+	// 2! * S(4, 2) = 2 * 7 = 14
+	EXPECT_EQ(count, 14u);
+}
+
+TEST(PartitionIteratorTest, SingleGroup) {
+	PartitionIterator it(5, 1);
+
+	ASSERT_FALSE(it.done());
+
+	vector<vector<size_t>> expected = {
+		{0, 1, 2, 3, 4}
+	};
+
+	EXPECT_EQ(it.get(), expected);
+
+	EXPECT_FALSE(it.nextPart());
+	EXPECT_TRUE(it.done());
+}
+
+TEST(PartitionIteratorTest, EveryElementOwnGroup) {
+	PartitionIterator it(4, 4);
+
+	ASSERT_FALSE(it.done());
+
+	vector<vector<size_t>> expected = {
+		{0},
+		{1},
+		{2},
+		{3}
+	};
+
+	EXPECT_EQ(it.get(), expected);
+
+	size_t count = 1;
+	while (it.nextPart()) {
+		count++;
+	}
+
+	EXPECT_EQ(count, factorial(4));
+	EXPECT_TRUE(it.done());
+}
+
+TEST(PartitionIteratorTest, InvalidPartitionSizes) {
+	PartitionIterator zeroGroups(4, 0);
+	EXPECT_TRUE(zeroGroups.done());
+
+	PartitionIterator tooManyGroups(3, 4);
+	EXPECT_TRUE(tooManyGroups.done());
+}

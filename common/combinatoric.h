@@ -33,4 +33,20 @@ struct CombinatoricIterator {
 	bool nextPerm();
 };
 
+struct PartitionIterator {
+	std::vector<size_t> assign;
+	size_t n, k;
+	bool valid;
 
+	PartitionIterator(size_t n, size_t k);
+	~PartitionIterator();
+
+	bool done() const;
+
+	std::vector<std::vector<size_t>> get() const;
+
+	bool nextPart();
+
+	bool step();
+	bool isValid() const;
+};

@@ -101,3 +101,68 @@ bool CombinatoricIterator::nextPerm() {
 	return nextComb();
 }
 
+PartitionIterator::PartitionIterator(size_t n, size_t k) :
+	assign(n, 0), n(n), k(k), valid(k > 0 and k <= n) {
+	while (valid and not isValid() and step()) { }
+}
+
+PartitionIterator::~PartitionIterator() {
+}
+
+bool PartitionIterator::done() const {
+	return not valid;
+}
+
+std::vector<std::vector<size_t>> PartitionIterator::get() const {
+	std::vector<std::vector<size_t> > result(k);
+	for (size_t i = 0; i < n; ++i) {
+		result[assign[i]].push_back(i);
+	}
+	return result;
+}
+
+bool PartitionIterator::nextPart() {
+	if (not valid) {
+		return false;
+	}
+
+	while (step()) {
+		if (isValid()) {
+			return true;
+		}
+	}
+
+	valid = false;
+	return false;
+}
+
+bool PartitionIterator::step() {
+	if (n == 0) {
+		return false;
+	}
+
+	for (size_t i = n; i-- > 0;) {
+		if (++assign[i] < k) {
+			return true;
+		}
+
+		assign[i] = 0;
+	}
+
+	return false;
+}
+
+bool PartitionIterator::isValid() const {
+	std::vector<bool> present(k, false);
+	for (size_t group : assign) {
+		present[group] = true;
+	}
+
+	for (bool exists : present) {
+		if (not exists) {
+			return false;
+		}
+	}
+	return true;
+}
+
