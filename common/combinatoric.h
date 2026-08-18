@@ -1,17 +1,38 @@
 #pragma once
 
 #include <vector>
+#include <array>
+#include <limits>
+
+template<typename Iterator>
+bool next_combination(Iterator first, Iterator last, size_t n, size_t g = std::numeric_limits<size_t>::max()) {
+	size_t k = std::distance(first, last);
+	if (g > k-1) {
+		g = k-1;
+	}
+	for (int i = (int)g; i >= 0; --i) {
+		if (*(first+i) < n - k + i) {
+			++*(first+i);
+			for (size_t j = i + 1; j < k; ++j) {
+				*(first+j) = *(first+(j-1)) + 1;
+			}
+			return true;
+		}
+	}
+	*first = n;
+	return false;
+}
 
 struct CombinatoricIterator {
 	std::vector<size_t> indices;
 	size_t n, k;
-	bool valid;
 
 	CombinatoricIterator(size_t n, size_t k);
 	~CombinatoricIterator();
 
 	static CombinatoricIterator Composition(size_t v, size_t n);
 
+	void set(size_t n, size_t k);
 	std::vector<size_t>::const_iterator begin() const;
 	std::vector<size_t>::const_iterator end() const;
 
@@ -28,17 +49,16 @@ struct CombinatoricIterator {
 
 	// resulting indices are ordered
 	// Use this for compositions as well
-	bool nextComb();
+	bool nextComb(size_t g = std::numeric_limits<size_t>::max());
 
 	bool nextPerm();
 };
 
 struct PartitionIterator {
-	std::vector<size_t> assign;
-	size_t n, k;
-	bool valid;
+	std::vector<CombinatoricIterator> assign;
+	std::vector<std::array<size_t, 2> > bounds;
 
-	PartitionIterator(size_t n, size_t k);
+	PartitionIterator(size_t n, std::vector<std::array<size_t, 2> > bounds);
 	~PartitionIterator();
 
 	bool done() const;
@@ -46,7 +66,4 @@ struct PartitionIterator {
 	std::vector<std::vector<size_t>> get() const;
 
 	bool nextPart();
-
-	bool step();
-	bool isValid() const;
 };

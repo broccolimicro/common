@@ -7,14 +7,24 @@ CombinatoricIterator::CombinatoricIterator(size_t n, size_t k) : n(n), k(k) {
 	for (size_t i = 0; i < k; ++i) {
 		indices[i] = i;
 	}
-	valid = n >= k;
 }
 
 CombinatoricIterator::~CombinatoricIterator() {
 }
 
 CombinatoricIterator CombinatoricIterator::Composition(size_t v, size_t n) {
-	return CombinatoricIterator(v-1, n-1);
+	CombinatoricIterator result(v-1, n-1);
+	result.indices.push_back(0);
+	return result;
+}
+
+void CombinatoricIterator::set(size_t n, size_t k) {
+	this->n = n;
+	this->k = k;
+	indices.resize(k);
+	for (size_t i = 0; i < k; ++i) {
+		indices[i] = i;
+	}
 }
 
 std::vector<size_t>::const_iterator CombinatoricIterator::begin() const {
@@ -30,7 +40,7 @@ size_t CombinatoricIterator::size() const {
 }
 
 bool CombinatoricIterator::done() const {
-	return not valid;
+	return indices.empty() or indices[0] >= n;
 }
 
 size_t CombinatoricIterator::operator[](size_t i) const {
@@ -60,109 +70,117 @@ std::vector<size_t> CombinatoricIterator::getComposition() const {
 }
 
 bool CombinatoricIterator::nextShift() {
-	if (indices[0] >= n-k) {
-		valid = false;
-		return false;
-	}
-	
 	for (auto i = indices.begin(); i != indices.end(); i++) {
 		(*i)++;
+	}
+	if (indices.empty() or indices[0] > n-k) {
+		indices[0] = n;
+		return false;
 	}
 	return true;
 }
 
-bool CombinatoricIterator::nextComb() {
-	if (k == 0 or indices[0] >= n-k) {
-		valid = false;
-		return false;
-	}
-
-	// Find the rightmost index that can be incremented
-	for (int i = (int)k - 1; i >= 0; --i) {
-		if (indices[i] < n - k + i) {
-			++indices[i];
-			for (size_t j = i + 1; j < k; ++j) {
-				indices[j] = indices[j - 1] + 1;
-			}
-			return true;
-		}
-	}
-
-	valid = false;
-	return false;
+bool CombinatoricIterator::nextComb(size_t g) {
+	return next_combination(indices.begin(), indices.begin()+k, n, g);
 }
 
 bool CombinatoricIterator::nextPerm() {
-	if (std::next_permutation(indices.begin(), indices.end())) {
+	if (std::next_permutation(indices.begin(), indices.begin()+k)) {
 		return true;
 	}
 
-	std::sort(indices.begin(), indices.end());
+	std::sort(indices.begin(), indices.begin()+k);
 	return nextComb();
 }
 
-PartitionIterator::PartitionIterator(size_t n, size_t k) :
-	assign(n, 0), n(n), k(k), valid(k > 0 and k <= n) {
-	while (valid and not isValid() and step()) { }
+PartitionIterator::PartitionIterator(size_t n, std::vector<std::array<size_t, 2> > bounds) : bounds(bounds) {
+	/*size_t remainder = 0;
+	for (size_t i = this->bounds.size(); i > 0; i--) {
+		if (this->bounds[i][1] > n-remainder) {
+			this->bounds[i][1] = n-remainder;
+		}
+		if (this->bounds[i][0] >= this->bounds[1]) {
+			return;
+		}
+		remainder += this->bounds[i][0];
+	}*/
+
+	int remaining = n;
+	for (const auto &bound : bounds) {
+		assign.push_back(CombinatoricIterator(remaining, bound[0]));
+		remaining -= bound[0];
+		if (remaining < 0) {
+			assign[0].indices[0] = n;
+			return;
+		}
+	}
 }
 
 PartitionIterator::~PartitionIterator() {
 }
 
 bool PartitionIterator::done() const {
-	return not valid;
+	return assign.empty() or assign[0].done();
 }
 
-std::vector<std::vector<size_t>> PartitionIterator::get() const {
-	std::vector<std::vector<size_t> > result(k);
-	for (size_t i = 0; i < n; ++i) {
-		result[assign[i]].push_back(i);
+std::vector<std::vector<size_t> > PartitionIterator::get() const {
+	std::vector<std::vector<size_t> > result(assign.size());
+	if (done()) {
+		return result;
+	}
+
+	std::vector<size_t> remainder(assign[0].n);
+	for (size_t i = 0; i < assign[0].n; i++) {
+		remainder[i] = i;
+	}
+
+	result[0] = assign[0].get();
+	for (size_t j = result[0].size(); j > 0; j--) {
+		remainder.erase(remainder.begin()+result[0][j-1]);
+	}
+
+	for (size_t i = 1; i < assign.size(); i++) {
+		std::vector<size_t> index = assign[i].get();
+		for (size_t j = 0; j < index.size(); j++) {
+			result[i].push_back(remainder[index[j]]);
+		}
+		for (size_t j = index.size(); j > 0; j--) {
+			remainder.erase(remainder.begin()+index[j-1]);
+		}
 	}
 	return result;
 }
 
 bool PartitionIterator::nextPart() {
-	if (not valid) {
-		return false;
-	}
+	for (size_t i = assign.size(); i > 0; i--) {
+		assign[i-1].nextComb();
 
-	while (step()) {
-		if (isValid()) {
+		if (assign[i-1].done()) {
+			if ((bounds[i-1][1] <= bounds[i-1][0] or assign[i-1].k+1 < bounds[i-1][1]) and assign[i-1].k+1 <= assign[i-1].n) {
+				assign[i-1].set(assign[i-1].n, assign[i-1].k+1);
+			}
+		}
+
+		int remaining = assign[i-1].n;
+		remaining -= assign[i-1].k;
+		if (remaining < 0) {
+			assign[i-1].indices[0] = assign[i-1].n;
+		} else {
+			for (size_t j = i; j < assign.size(); j++) {
+				assign[j].set(remaining, bounds[j][0]);
+				remaining -= assign[j].k;
+				if (remaining < 0) {
+					assign[i-1].indices[0] = assign[i-1].n;
+					break;
+				}
+			}
+		}
+
+		if (not assign[i-1].done()) {
 			return true;
 		}
 	}
 
-	valid = false;
 	return false;
-}
-
-bool PartitionIterator::step() {
-	if (n == 0) {
-		return false;
-	}
-
-	for (size_t i = n; i-- > 0;) {
-		if (++assign[i] < k) {
-			return true;
-		}
-
-		assign[i] = 0;
-	}
-
-	return false;
-}
-
-bool PartitionIterator::isValid() const {
-	std::vector<bool> present(k, false);
-	for (size_t group : assign) {
-		present[group] = true;
-	}
-
-	for (bool exists : present) {
-		if (not exists) {
-			return false;
-		}
-	}
-	return true;
 }
 
