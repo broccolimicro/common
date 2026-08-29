@@ -117,7 +117,7 @@ TEST(CombinatoricIteratorTest, CompositionSingleElement) {
 }
 
 TEST(PartitionIteratorTest, FullEnumeration) {
-	vector<int> elems = {0, 1, 2, 3, 4};
+	size_t elems = 5;
 	vector<size_t> lo = {1, 1, 1};
 	vector<size_t> hi = {2, 2, 2};
 
@@ -126,13 +126,13 @@ TEST(PartitionIteratorTest, FullEnumeration) {
 	size_t count = 0;
 
 	while (not it.done()) {
-		vector<vector<int>> partition = it.get();
+		vector<vector<size_t> > partition = it.get();
 
 		cout << ::to_string(partition) << endl;
 
 		ASSERT_EQ(partition.size(), 3u);
 
-		vector<bool> seen(elems.size(), false);
+		vector<bool> seen(elems, false);
 
 		for (size_t group = 0; group < partition.size(); ++group) {
 			EXPECT_GE(partition[group].size(), lo[group]);
@@ -140,7 +140,7 @@ TEST(PartitionIteratorTest, FullEnumeration) {
 
 			for (int element : partition[group]) {
 				ASSERT_GE(element, 0);
-				ASSERT_LT((size_t)element, elems.size());
+				ASSERT_LT((size_t)element, elems);
 				EXPECT_FALSE(seen[element]);
 				seen[element] = true;
 			}
@@ -204,11 +204,11 @@ TEST(PartitionIteratorTest, InvalidPartitionSizes) {
 }*/
 
 TEST(PartitionTest, GroupSizeConstraints) {
-	vector<int> elems = {0, 1, 2, 3};
+	size_t elems = 4;
 	vector<size_t> lo = {1, 1};
 	vector<size_t> hi = {2, 2};
 
-	vector<vector<vector<int>>> result =
+	vector<vector<vector<size_t> >> result =
 		allPartitions(elems, lo, hi, true);
 
 	// All 4 elements must be used, and both groups must have
@@ -221,12 +221,12 @@ TEST(PartitionTest, GroupSizeConstraints) {
 		EXPECT_EQ(partition[0].size(), 2u);
 		EXPECT_EQ(partition[1].size(), 2u);
 
-		vector<bool> seen(elems.size(), false);
+		vector<bool> seen(elems, false);
 
 		for (const auto& group : partition) {
 			for (int elem : group) {
 				ASSERT_GE(elem, 0);
-				ASSERT_LT((size_t)elem, elems.size());
+				ASSERT_LT((size_t)elem, elems);
 				EXPECT_FALSE(seen[elem]);
 				seen[elem] = true;
 			}
@@ -239,11 +239,11 @@ TEST(PartitionTest, GroupSizeConstraints) {
 }
 
 TEST(PartitionTest, OptionalElements) {
-	vector<int> elems = {0, 1, 2};
+	size_t elems = 3;
 	vector<size_t> lo = {1, 1};
 	vector<size_t> hi = {2, 2};
 
-	vector<vector<vector<int>>> result =
+	vector<vector<vector<size_t> > > result =
 		allPartitions(elems, lo, hi, false);
 
 	// Every returned partition must satisfy the group constraints.
@@ -263,12 +263,12 @@ TEST(PartitionTest, OptionalElements) {
 		EXPECT_GE(count, 2u);
 		EXPECT_LE(count, 3u);
 
-		vector<bool> seen(elems.size(), false);
+		vector<bool> seen(elems, false);
 
 		for (const auto& group : partition) {
 			for (int elem : group) {
 				ASSERT_GE(elem, 0);
-				ASSERT_LT((size_t)elem, elems.size());
+				ASSERT_LT((size_t)elem, elems);
 				EXPECT_FALSE(seen[elem]);
 				seen[elem] = true;
 			}
@@ -277,17 +277,17 @@ TEST(PartitionTest, OptionalElements) {
 }
 
 TEST(PartitionIteratorTest, MatchesAllPartitions) {
-	vector<int> elems = {0, 1, 2, 3};
+	size_t elems = 4;
 	vector<size_t> lo = {1, 1};
 	vector<size_t> hi = {2, 2};
 
 	for (bool allRequired : {false, true}) {
-		vector<vector<vector<int>>> expected =
+		vector<vector<vector<size_t> > > expected =
 			allPartitions(elems, lo, hi, allRequired);
 
 		PartitionIterator it(elems, lo, hi, allRequired);
 
-		vector<vector<vector<int>>> actual;
+		vector<vector<vector<size_t> > > actual;
 
 		while (not it.done()) {
 			actual.push_back(it.get());

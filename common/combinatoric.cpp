@@ -99,9 +99,9 @@ bool CombinatoricIterator::nextPerm() {
 	return nextComb();
 }
 
-PartitionIterator::PartitionIterator(std::vector<int> elems, std::vector<size_t> lo, std::vector<size_t> hi, bool allRequired) {
+PartitionIterator::PartitionIterator(size_t n, std::vector<size_t> lo, std::vector<size_t> hi, bool allRequired) {
 	this->allRequired = allRequired;
-	this->elems = elems;
+	this->n = n;
 	this->lo = lo;
 	this->hi = hi;
 
@@ -127,7 +127,7 @@ bool PartitionIterator::step(bool pop) {
 					break;
 				}
 			}
-			if (found and (not allRequired or stack.back().index >= elems.size())) {
+			if (found and (not allRequired or stack.back().index >= n)) {
 				return true;
 			}
 		}
@@ -135,7 +135,7 @@ bool PartitionIterator::step(bool pop) {
 
 		Partition curr = std::move(stack.back());
 		stack.pop_back();
-		if (curr.index >= elems.size()) {
+		if (curr.index >= n) {
 			continue;
 		}
 
@@ -144,7 +144,7 @@ bool PartitionIterator::step(bool pop) {
 		for (size_t i = 0; i < curr.part.size(); i++) {
 			if (i >= hi.size() or curr.part[i].size() < hi[i] or hi[i] == 0) {
 				stack.push_back(curr);
-				stack.back().part[i].push_back(elems[index]);
+				stack.back().part[i].push_back(index);
 			}
 		}
 		if (not allRequired) {
@@ -159,7 +159,7 @@ bool PartitionIterator::done() const {
 	return stack.empty();
 }
 
-std::vector<std::vector<int> > PartitionIterator::get() const {
+std::vector<std::vector<size_t> > PartitionIterator::get() const {
 	return stack.back().part;
 }
 
@@ -167,10 +167,10 @@ bool PartitionIterator::nextPart() {
 	return step(true);
 }
 
-std::vector<std::vector<std::vector<int> > > allPartitions(std::vector<int> elems, std::vector<size_t> lo, std::vector<size_t> hi, bool allRequired) {
+std::vector<std::vector<std::vector<size_t> > > allPartitions(size_t n, std::vector<size_t> lo, std::vector<size_t> hi, bool allRequired) {
 	struct Partition {
 		size_t index;
-		std::vector<std::vector<int> > part;
+		std::vector<std::vector<size_t> > part;
 	};
 	std::vector<Partition> stack;
 	stack.push_back(Partition());
@@ -179,7 +179,7 @@ std::vector<std::vector<std::vector<int> > > allPartitions(std::vector<int> elem
 		stack.back().part.push_back({});
 	}
 
-	std::vector<std::vector<std::vector<int> > > result;
+	std::vector<std::vector<std::vector<size_t> > > result;
 	while (not stack.empty()) {
 		Partition curr = std::move(stack.back());
 		stack.pop_back();
@@ -191,10 +191,10 @@ std::vector<std::vector<std::vector<int> > > allPartitions(std::vector<int> elem
 				break;
 			}
 		}
-		if (found and (not allRequired or curr.index >= elems.size())) {
+		if (found and (not allRequired or curr.index >= n)) {
 			result.push_back(curr.part);
 		}
-		if (curr.index >= elems.size()) {
+		if (curr.index >= n) {
 			continue;
 		}
 
@@ -203,7 +203,7 @@ std::vector<std::vector<std::vector<int> > > allPartitions(std::vector<int> elem
 		for (size_t i = 0; i < curr.part.size(); i++) {
 			if (i >= hi.size() or curr.part[i].size() < hi[i] or hi[i] == 0) {
 				stack.push_back(curr);
-				stack.back().part[i].push_back(elems[index]);
+				stack.back().part[i].push_back(index);
 			}
 		}
 		if (not allRequired) {
