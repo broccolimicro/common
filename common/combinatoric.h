@@ -7,14 +7,14 @@
 template<typename Iterator>
 bool next_combination(Iterator first, Iterator last, size_t n, size_t g = std::numeric_limits<size_t>::max()) {
 	size_t k = std::distance(first, last);
-	if (g > k-1) {
+	if (g >= k) {
 		g = k-1;
 	}
 	for (int i = (int)g; i >= 0; --i) {
 		if (*(first+i) < n - k + i) {
 			++*(first+i);
 			for (size_t j = i + 1; j < k; ++j) {
-				*(first+j) = *(first+(j-1)) + 1;
+				*(first+j) = *(first+j-1) + 1;
 			}
 			return true;
 		}

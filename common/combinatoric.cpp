@@ -70,13 +70,19 @@ std::vector<size_t> CombinatoricIterator::getComposition() const {
 }
 
 bool CombinatoricIterator::nextShift() {
-	for (auto i = indices.begin(); i != indices.end(); i++) {
-		(*i)++;
+	if (indices.empty() or k > n) {
+		return false;
 	}
-	if (indices.empty() or indices[0] > n-k) {
+
+	for (auto i = indices.begin(); i != indices.end(); ++i) {
+		++*i;
+	}
+
+	if (indices[0] > n - k) {
 		indices[0] = n;
 		return false;
 	}
+
 	return true;
 }
 
@@ -136,7 +142,7 @@ bool PartitionIterator::step(bool pop) {
 		size_t index = curr.index;
 		++curr.index;
 		for (size_t i = 0; i < curr.part.size(); i++) {
-			if (i >= hi.size() or curr.part[i].size() < hi[i] or hi[i] < lo[i]) {
+			if (i >= hi.size() or curr.part[i].size() < hi[i] or hi[i] == 0) {
 				stack.push_back(curr);
 				stack.back().part[i].push_back(elems[index]);
 			}
@@ -195,7 +201,7 @@ std::vector<std::vector<std::vector<int> > > allPartitions(std::vector<int> elem
 		size_t index = curr.index;
 		++curr.index;
 		for (size_t i = 0; i < curr.part.size(); i++) {
-			if (i >= hi.size() or curr.part[i].size() < hi[i] or hi[i] < lo[i]) {
+			if (i >= hi.size() or curr.part[i].size() < hi[i] or hi[i] == 0) {
 				stack.push_back(curr);
 				stack.back().part[i].push_back(elems[index]);
 			}
