@@ -67,3 +67,5 @@ struct PartitionIterator {
 
 	bool nextPart();
 };
+
+std::vector<std::vector<std::vector<int> > > allPartitions(std::vector<int> elems, std::vector<size_t> lo, std::vector<size_t> hi, bool allRequired=false);

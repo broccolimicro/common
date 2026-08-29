@@ -193,3 +193,77 @@ TEST(PartitionIteratorTest, InvalidPartitionSizes) {
 	PartitionIterator tooManyGroups(3, 4);
 	EXPECT_TRUE(tooManyGroups.done());
 }*/
+
+TEST(PartitionTest, GroupSizeConstraints) {
+	vector<int> elems = {0, 1, 2, 3};
+	vector<size_t> lo = {1, 1};
+	vector<size_t> hi = {2, 2};
+
+	vector<vector<vector<int>>> result =
+		allPartitions(elems, lo, hi, true);
+
+	// All 4 elements must be used, and both groups must have
+	// between 1 and 2 elements. Therefore each group has size 2.
+	EXPECT_EQ(result.size(), 6u);
+
+	for (const auto& partition : result) {
+		ASSERT_EQ(partition.size(), 2u);
+
+		EXPECT_EQ(partition[0].size(), 2u);
+		EXPECT_EQ(partition[1].size(), 2u);
+
+		vector<bool> seen(elems.size(), false);
+
+		for (const auto& group : partition) {
+			for (int elem : group) {
+				ASSERT_GE(elem, 0);
+				ASSERT_LT((size_t)elem, elems.size());
+				EXPECT_FALSE(seen[elem]);
+				seen[elem] = true;
+			}
+		}
+
+		for (bool value : seen) {
+			EXPECT_TRUE(value);
+		}
+	}
+}
+
+TEST(PartitionTest, OptionalElements) {
+	vector<int> elems = {0, 1, 2};
+	vector<size_t> lo = {1, 1};
+	vector<size_t> hi = {2, 2};
+
+	vector<vector<vector<int>>> result =
+		allPartitions(elems, lo, hi, false);
+
+	// Every returned partition must satisfy the group constraints.
+	// Since elements are optional, the total number of assigned
+	// elements can range from 2 through 3.
+	ASSERT_FALSE(result.empty());
+
+	for (const auto& partition : result) {
+		ASSERT_EQ(partition.size(), 2u);
+
+		EXPECT_GE(partition[0].size(), 1u);
+		EXPECT_LE(partition[0].size(), 2u);
+		EXPECT_GE(partition[1].size(), 1u);
+		EXPECT_LE(partition[1].size(), 2u);
+
+		size_t count = partition[0].size() + partition[1].size();
+		EXPECT_GE(count, 2u);
+		EXPECT_LE(count, 3u);
+
+		vector<bool> seen(elems.size(), false);
+
+		for (const auto& group : partition) {
+			for (int elem : group) {
+				ASSERT_GE(elem, 0);
+				ASSERT_LT((size_t)elem, elems.size());
+				EXPECT_FALSE(seen[elem]);
+				seen[elem] = true;
+			}
+		}
+	}
+}
+

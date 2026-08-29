@@ -184,3 +184,50 @@ bool PartitionIterator::nextPart() {
 	return false;
 }
 
+std::vector<std::vector<std::vector<int> > > allPartitions(std::vector<int> elems, std::vector<size_t> lo, std::vector<size_t> hi, bool allRequired) {
+	struct Partition {
+		size_t index;
+		std::vector<std::vector<int> > part;
+	};
+	std::vector<Partition> stack;
+	stack.push_back(Partition());
+	stack.back().index = 0;
+	for (size_t i = 0, j = std::max(lo.size(), hi.size()); i < j; i++) {
+		stack.back().part.push_back({});
+	}
+
+	std::vector<std::vector<std::vector<int> > > result;
+	while (not stack.empty()) {
+		Partition curr = std::move(stack.back());
+		stack.pop_back();
+
+		bool found = true;
+		for (size_t i = 0, j = std::min(lo.size(), curr.part.size()); i < j; i++) {
+			if (curr.part[i].size() < lo[i]) {
+				found = false;
+				break;
+			}
+		}
+		if (found and (not allRequired or curr.index >= elems.size())) {
+			result.push_back(curr.part);
+		}
+		if (curr.index >= elems.size()) {
+			continue;
+		}
+
+		size_t index = curr.index;
+		++curr.index;
+		for (size_t i = 0; i < curr.part.size(); i++) {
+			if (i >= hi.size() or curr.part[i].size() < hi[i]) {
+				stack.push_back(curr);
+				stack.back().part[i].push_back(elems[index]);
+			}
+		}
+		if (not allRequired) {
+			stack.push_back(curr);
+		}
+	}
+
+	return result;
+}
+
