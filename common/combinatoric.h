@@ -55,15 +55,25 @@ struct CombinatoricIterator {
 };
 
 struct PartitionIterator {
-	std::vector<CombinatoricIterator> assign;
-	std::vector<std::array<size_t, 2> > bounds;
+	struct Partition {
+		size_t index;
+		std::vector<std::vector<int> > part;
+	};
 
-	PartitionIterator(size_t n, std::vector<std::array<size_t, 2> > bounds);
+	bool allRequired;
+	std::vector<int> elems;
+	std::vector<Partition> stack;
+	std::vector<size_t> lo;
+	std::vector<size_t> hi;
+
+	PartitionIterator(std::vector<int> elems, std::vector<size_t> lo, std::vector<size_t> hi, bool allRequired=false);
 	~PartitionIterator();
+
+	bool step(bool pop);
 
 	bool done() const;
 
-	std::vector<std::vector<size_t>> get() const;
+	std::vector<std::vector<int> > get() const;
 
 	bool nextPart();
 };

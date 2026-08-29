@@ -117,35 +117,44 @@ TEST(CombinatoricIteratorTest, CompositionSingleElement) {
 }
 
 TEST(PartitionIteratorTest, FullEnumeration) {
-	size_t n = 5;
-	size_t k = 3;
+	vector<int> elems = {0, 1, 2, 3, 4};
+	vector<size_t> lo = {1, 1, 1};
+	vector<size_t> hi = {2, 2, 2};
 
-	PartitionIterator it(n, {{1, 0}, {1, 2}, {1, 2}});
+	PartitionIterator it(elems, lo, hi, true);
 
 	size_t count = 0;
 
 	while (not it.done()) {
-		vector<vector<size_t>> partition = it.get();
+		vector<vector<int>> partition = it.get();
 
 		cout << ::to_string(partition) << endl;
 
-		ASSERT_EQ(partition.size(), k);
+		ASSERT_EQ(partition.size(), 3u);
 
-		vector<bool> seen(n, false);
+		vector<bool> seen(elems.size(), false);
 
-		for (size_t group = 0; group < k; ++group) {
-			EXPECT_FALSE(partition[group].empty());
+		for (size_t group = 0; group < partition.size(); ++group) {
+			EXPECT_GE(partition[group].size(), lo[group]);
+			EXPECT_LE(partition[group].size(), hi[group]);
 
-			for (size_t element : partition[group]) {
-				ASSERT_LT(element, n);
+			for (int element : partition[group]) {
+				ASSERT_GE(element, 0);
+				ASSERT_LT((size_t)element, elems.size());
 				EXPECT_FALSE(seen[element]);
 				seen[element] = true;
 			}
 		}
 
-		count++;
+		for (bool elementSeen : seen) {
+			EXPECT_TRUE(elementSeen);
+		}
+
+		++count;
 		it.nextPart();
 	}
+
+	EXPECT_EQ(count, 90u);
 }
 
 /*TEST(PartitionIteratorTest, SingleGroup) {
@@ -267,3 +276,24 @@ TEST(PartitionTest, OptionalElements) {
 	}
 }
 
+TEST(PartitionIteratorTest, MatchesAllPartitions) {
+	vector<int> elems = {0, 1, 2, 3};
+	vector<size_t> lo = {1, 1};
+	vector<size_t> hi = {2, 2};
+
+	for (bool allRequired : {false, true}) {
+		vector<vector<vector<int>>> expected =
+			allPartitions(elems, lo, hi, allRequired);
+
+		PartitionIterator it(elems, lo, hi, allRequired);
+
+		vector<vector<vector<int>>> actual;
+
+		while (not it.done()) {
+			actual.push_back(it.get());
+			it.nextPart();
+		}
+
+		EXPECT_EQ(actual, expected);
+	}
+}

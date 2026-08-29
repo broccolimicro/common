@@ -93,95 +93,72 @@ bool CombinatoricIterator::nextPerm() {
 	return nextComb();
 }
 
-PartitionIterator::PartitionIterator(size_t n, std::vector<std::array<size_t, 2> > bounds) : bounds(bounds) {
-	/*size_t remainder = 0;
-	for (size_t i = this->bounds.size(); i > 0; i--) {
-		if (this->bounds[i][1] > n-remainder) {
-			this->bounds[i][1] = n-remainder;
-		}
-		if (this->bounds[i][0] >= this->bounds[1]) {
-			return;
-		}
-		remainder += this->bounds[i][0];
-	}*/
+PartitionIterator::PartitionIterator(std::vector<int> elems, std::vector<size_t> lo, std::vector<size_t> hi, bool allRequired) {
+	this->allRequired = allRequired;
+	this->elems = elems;
+	this->lo = lo;
+	this->hi = hi;
 
-	int remaining = n;
-	for (const auto &bound : bounds) {
-		assign.push_back(CombinatoricIterator(remaining, bound[0]));
-		remaining -= bound[0];
-		if (remaining < 0) {
-			assign[0].indices[0] = n;
-			return;
-		}
+	stack.push_back(Partition());
+	stack.back().index = 0;
+	for (size_t i = 0, j = std::max(lo.size(), hi.size()); i < j; i++) {
+		stack.back().part.push_back({});
 	}
+	step(false);
 }
 
 PartitionIterator::~PartitionIterator() {
 }
 
-bool PartitionIterator::done() const {
-	return assign.empty() or assign[0].done();
-}
-
-std::vector<std::vector<size_t> > PartitionIterator::get() const {
-	std::vector<std::vector<size_t> > result(assign.size());
-	if (done()) {
-		return result;
-	}
-
-	std::vector<size_t> remainder(assign[0].n);
-	for (size_t i = 0; i < assign[0].n; i++) {
-		remainder[i] = i;
-	}
-
-	result[0] = assign[0].get();
-	for (size_t j = result[0].size(); j > 0; j--) {
-		remainder.erase(remainder.begin()+result[0][j-1]);
-	}
-
-	for (size_t i = 1; i < assign.size(); i++) {
-		std::vector<size_t> index = assign[i].get();
-		for (size_t j = 0; j < index.size(); j++) {
-			result[i].push_back(remainder[index[j]]);
-		}
-		for (size_t j = index.size(); j > 0; j--) {
-			remainder.erase(remainder.begin()+index[j-1]);
-		}
-	}
-	return result;
-}
-
-bool PartitionIterator::nextPart() {
-	for (size_t i = assign.size(); i > 0; i--) {
-		assign[i-1].nextComb();
-
-		if (assign[i-1].done()) {
-			if ((bounds[i-1][1] <= bounds[i-1][0] or assign[i-1].k+1 < bounds[i-1][1]) and assign[i-1].k+1 <= assign[i-1].n) {
-				assign[i-1].set(assign[i-1].n, assign[i-1].k+1);
-			}
-		}
-
-		int remaining = assign[i-1].n;
-		remaining -= assign[i-1].k;
-		if (remaining < 0) {
-			assign[i-1].indices[0] = assign[i-1].n;
-		} else {
-			for (size_t j = i; j < assign.size(); j++) {
-				assign[j].set(remaining, bounds[j][0]);
-				remaining -= assign[j].k;
-				if (remaining < 0) {
-					assign[i-1].indices[0] = assign[i-1].n;
+bool PartitionIterator::step(bool pop) {
+	bool first = true;
+	while (not stack.empty()) {
+		if (not pop or not first) {
+			bool found = true;
+			for (size_t i = 0, j = std::min(lo.size(), stack.back().part.size()); i < j; i++) {
+				if (stack.back().part[i].size() < lo[i]) {
+					found = false;
 					break;
 				}
 			}
+			if (found and (not allRequired or stack.back().index >= elems.size())) {
+				return true;
+			}
+		}
+		first = false;
+
+		Partition curr = std::move(stack.back());
+		stack.pop_back();
+		if (curr.index >= elems.size()) {
+			continue;
 		}
 
-		if (not assign[i-1].done()) {
-			return true;
+		size_t index = curr.index;
+		++curr.index;
+		for (size_t i = 0; i < curr.part.size(); i++) {
+			if (i >= hi.size() or curr.part[i].size() < hi[i] or hi[i] < lo[i]) {
+				stack.push_back(curr);
+				stack.back().part[i].push_back(elems[index]);
+			}
+		}
+		if (not allRequired) {
+			stack.push_back(std::move(curr));
 		}
 	}
 
 	return false;
+}
+
+bool PartitionIterator::done() const {
+	return stack.empty();
+}
+
+std::vector<std::vector<int> > PartitionIterator::get() const {
+	return stack.back().part;
+}
+
+bool PartitionIterator::nextPart() {
+	return step(true);
 }
 
 std::vector<std::vector<std::vector<int> > > allPartitions(std::vector<int> elems, std::vector<size_t> lo, std::vector<size_t> hi, bool allRequired) {
@@ -218,13 +195,13 @@ std::vector<std::vector<std::vector<int> > > allPartitions(std::vector<int> elem
 		size_t index = curr.index;
 		++curr.index;
 		for (size_t i = 0; i < curr.part.size(); i++) {
-			if (i >= hi.size() or curr.part[i].size() < hi[i]) {
+			if (i >= hi.size() or curr.part[i].size() < hi[i] or hi[i] < lo[i]) {
 				stack.push_back(curr);
 				stack.back().part[i].push_back(elems[index]);
 			}
 		}
 		if (not allRequired) {
-			stack.push_back(curr);
+			stack.push_back(std::move(curr));
 		}
 	}
 
