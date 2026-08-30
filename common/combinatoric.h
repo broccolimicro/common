@@ -54,6 +54,27 @@ struct CombinatoricIterator {
 	bool nextPerm();
 };
 
+struct LatticeIterator {
+	std::vector<size_t> indices;
+	std::vector<size_t> width;
+
+	LatticeIterator(std::vector<size_t> width);
+	~LatticeIterator();
+
+	void set(std::vector<size_t> width);
+	std::vector<size_t>::const_iterator begin() const;
+	std::vector<size_t>::const_iterator end() const;
+
+	size_t size() const;
+	bool done() const;
+
+	size_t operator[](size_t i) const;
+
+	const std::vector<size_t> &get() const;
+
+	bool next();
+};
+
 struct PartitionIterator {
 	struct Partition {
 		size_t index;
@@ -73,7 +94,7 @@ struct PartitionIterator {
 
 	bool done() const;
 
-	std::vector<std::vector<size_t> > get() const;
+	const std::vector<std::vector<size_t> > &get() const;
 
 	bool nextPart();
 };

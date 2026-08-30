@@ -99,6 +99,63 @@ bool CombinatoricIterator::nextPerm() {
 	return nextComb();
 }
 
+LatticeIterator::LatticeIterator(std::vector<size_t> width) : width(width) {
+	indices.resize(width.size(), 0);
+}
+
+LatticeIterator::~LatticeIterator() {
+}
+
+void LatticeIterator::set(std::vector<size_t> width) {
+	this->width = width;
+	indices.resize(width.size(), 0);
+}
+
+std::vector<size_t>::const_iterator LatticeIterator::begin() const {
+	return indices.begin();
+}
+
+std::vector<size_t>::const_iterator LatticeIterator::end() const {
+	return indices.end();
+}
+
+size_t LatticeIterator::size() const {
+	size_t result = 1;
+	for (size_t w : width) {
+		result *= w;
+	}
+	return result;
+}
+
+bool LatticeIterator::done() const {
+	return indices.empty() or indices[0] >= width[0];
+}
+
+size_t LatticeIterator::operator[](size_t i) const {
+	return indices[i];
+}
+
+const std::vector<size_t> &LatticeIterator::get() const {
+	return indices;
+}
+
+bool LatticeIterator::next() {
+	if (indices.empty() or indices[0] >= width[0]) {
+		return false;
+	}
+
+	indices.back()++;
+	for (size_t i = indices.size()-1; i > 0; i--) {
+		if (indices[i] < width[i]) {
+			break;
+		}
+		indices[i] = 0;
+		indices[i-1]++;
+	}
+
+	return indices[0] < width[0];
+}
+
 PartitionIterator::PartitionIterator(size_t n, std::vector<size_t> lo, std::vector<size_t> hi, bool allRequired) {
 	this->allRequired = allRequired;
 	this->n = n;
@@ -159,7 +216,7 @@ bool PartitionIterator::done() const {
 	return stack.empty();
 }
 
-std::vector<std::vector<size_t> > PartitionIterator::get() const {
+const std::vector<std::vector<size_t> > &PartitionIterator::get() const {
 	return stack.back().part;
 }
 
