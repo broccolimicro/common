@@ -30,6 +30,14 @@ struct index_vector {
 		return elems.size() - 1;
 	}
 
+	void alloc(size_t count) {
+		elems.resize(elems.size()+count);
+		valid.resize(valid.size()+count, false);
+		for (size_t i = 0; i < count; i++) {
+			free.push_back(elems.size() - 1 - i);
+		}
+	}
+
 	size_type next_index() const {
 		if (not free.empty()) {
 			return free.back();
@@ -117,6 +125,10 @@ struct index_vector {
 
 	size_type count() const {
 		return elems.size() - free.size();
+	}
+
+	bool empty() const {
+		return count() == 0;
 	}
 
 	void clear() {
