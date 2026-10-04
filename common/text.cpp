@@ -260,3 +260,101 @@ size_t decodeBase32(const string &str) {
 	}
 	return result;
 }
+
+std::vector<std::string> splitLines(const std::string& text) {
+	std::vector<std::string> lines;
+	std::istringstream stream(text);
+	std::string line;
+
+	while (std::getline(stream, line)) {
+		lines.push_back(line);
+	}
+
+	return lines;
+}
+
+std::vector<DiffLine> lineDiff(const std::string &oldText, const std::string &newText) {
+	const std::vector<std::string> oldLines = splitLines(oldText);
+	const std::vector<std::string> newLines = splitLines(newText);
+
+	const size_t oldCount = oldLines.size();
+	const size_t newCount = newLines.size();
+
+	// Longest Common Subsequence table.
+	std::vector<std::vector<size_t>> lcs(oldCount + 1, std::vector<size_t>(newCount + 1, 0));
+
+	for (size_t i = oldCount; i > 0; --i) {
+		for (size_t j = newCount; j > 0; --j) {
+			if (oldLines[i - 1] == newLines[j - 1]) {
+				lcs[i - 1][j - 1] = lcs[i][j] + 1;
+			} else {
+				lcs[i - 1][j - 1] = std::max(lcs[i][j - 1], lcs[i - 1][j]);
+			}
+		}
+	}
+
+	std::vector<DiffLine> result;
+
+	size_t i = 0;
+	size_t j = 0;
+
+	while (i < oldCount and j < newCount) {
+		if (oldLines[i] == newLines[j]) {
+			result.push_back({DiffLine::UNCHANGED, oldLines[i]});
+			++i;
+			++j;
+		} else if (lcs[i + 1][j] >= lcs[i][j + 1]) {
+			result.push_back({DiffLine::DELETED, oldLines[i]});
+			++i;
+		} else {
+			result.push_back({DiffLine::ADDED, newLines[j]});
+			++j;
+		}
+	}
+
+	while (i < oldCount) {
+		result.push_back({DiffLine::DELETED, oldLines[i]});
+		++i;
+	}
+
+	while (j < newCount) {
+		result.push_back({DiffLine::ADDED, newLines[j]});
+		++j;
+	}
+
+	return result;
+}
+
+ostream &operator<<(ostream &os, const DiffLine &line) {
+	switch (line.type) {
+		case DiffLine::ADDED:
+			os << KGRN << "+ " << line.text << KNRM << '\n';
+			break;
+
+		case DiffLine::DELETED:
+			os << KRED << "- " << line.text << KNRM << '\n';
+			break;
+
+		case DiffLine::UNCHANGED:
+			os << "  " << line.text << '\n';
+			break;
+	}
+	return os;
+}
+
+ostream &operator<<(ostream &os, const std::vector<DiffLine> &diff) {
+	for (const DiffLine& line : diff) {
+		os << line;
+	}
+	return os;
+}
+
+bool isMatch(const std::vector<DiffLine> &diff) {
+	for (const DiffLine& line : diff) {
+		if (line.type != DiffLine::UNCHANGED) {
+			return false;
+		}
+	}
+	return true;
+}
+

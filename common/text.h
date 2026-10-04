@@ -99,3 +99,21 @@ std::string escapePath(const std::string &input);
 
 string encodeBase32(size_t id);
 size_t decodeBase32(const string &str);
+
+struct DiffLine {
+	enum LineType {
+		UNCHANGED,
+		ADDED,
+		DELETED
+	};
+
+	LineType type;
+	std::string text;
+};
+
+std::vector<std::string> splitLines(const std::string& text);
+std::vector<DiffLine> lineDiff(const std::string &oldText, const std::string &newText);
+ostream &operator<<(ostream &os, const DiffLine &line);
+ostream &operator<<(ostream &os, const std::vector<DiffLine> &diff);
+bool isMatch(const std::vector<DiffLine> &diff);
+
